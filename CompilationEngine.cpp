@@ -10,7 +10,8 @@
 using namespace std;
 
 template <typename T>
-string to_string(T value) {
+string to_string(T value)
+{
   // create an output string stream
   std::ostringstream os;
 
@@ -21,20 +22,25 @@ string to_string(T value) {
   return os.str();
 }
 
-Segment kind2Segment(ST::Kind kind) {
-  switch (kind) {
-    case ST::STATIC:
-      return STATIC;
-    case ST::FIELD:
-      return THIS;
-    case ST::ARG:
-      return ARG;
-    case ST::VAR:
-      return LOCAL;
+Segment kind2Segment(ST::Kind kind)
+{
+  switch (kind)
+  {
+  case ST::STATIC:
+    return STATIC;
+  case ST::FIELD:
+    return THIS;
+  case ST::ARG:
+    return ARG;
+  case ST::VAR:
+    return LOCAL;
+  default:
+    return NONE;
   }
 }
 
-CompilationEngine::CompilationEngine(string inFileName, string outFileName) {
+CompilationEngine::CompilationEngine(string inFileName, string outFileName)
+{
   jt = new JackTokenizer(inFileName);
   out.open((outFileName + "_").c_str());
   vm = new VMWriter(outFileName.c_str());
@@ -45,25 +51,31 @@ CompilationEngine::CompilationEngine(string inFileName, string outFileName) {
 
 void CompilationEngine::nextToken() { jt->advance(); }
 
-void CompilationEngine::eat(string tk) {
-  if (jt->currentToken == tk) {
+void CompilationEngine::eat(string tk)
+{
+  if (jt->currentToken == tk)
+  {
     // cout << "ok" << endl;
     writeTerminal(jt->tagToken());
-  } else {
+  }
+  else
+  {
     cout << tk << " expected " << jt->currentToken << " found" << endl;
     exit(0);
   }
 }
 
-bool CompilationEngine::compile() { compileClass(); }
+void CompilationEngine::compile() { compileClass(); }
 
-bool CompilationEngine::isOp(char ch) {
+bool CompilationEngine::isOp(char ch)
+{
   // cout <<"operador: " << ch << endl;
   return (ch == '+' || ch == '-' || ch == '*' || ch == '/' || ch == '&' ||
           ch == '|' || ch == '<' || ch == '>' || ch == '=');
 }
 
-void CompilationEngine::compileClass() {
+void CompilationEngine::compileClass()
+{
   tagNonTerminal("class");
 
   // cout << "class" << endl;
@@ -92,31 +104,35 @@ void CompilationEngine::compileClass() {
   untagNonTerminal("class");
 }
 
-void CompilationEngine::writeIdentifier() {
+void CompilationEngine::writeIdentifier()
+{
   string name = jt->currentToken;
   ST::Kind kind = st->kindOf(name);
   string type;
-  if (kind != ST::NONE) {
+  if (kind != ST::NONE)
+  {
     type = st->typeOf(name);
     write("<identifier type=" + type + " kind=" + st->fromKind(kind) +
           " index=" + to_string(st->indexOf(name)) + "> " + name +
           " </identifier>");
   }
-
-  //
 }
 
-void CompilationEngine::compileClassVarDec() {
+void CompilationEngine::compileClassVarDec()
+{
   // cout << "compileClassVarDec" << endl;
   string name, type;
   ST::Kind kind;
 
   tagNonTerminal("classVarDec");
 
-  if (jt->keyword() == kFIELD) {
+  if (jt->keyword() == kFIELD)
+  {
     eat("field");
     kind = ST::FIELD;
-  } else {
+  }
+  else
+  {
     eat("static");
     kind = ST::STATIC;
   }
@@ -135,7 +151,8 @@ void CompilationEngine::compileClassVarDec() {
 
   nextToken();
 
-  while (jt->tokenType() == tSYMBOL && jt->symbol() == ',') {
+  while (jt->tokenType() == tSYMBOL && jt->symbol() == ',')
+  {
     eat(",");
     nextToken();
     // declaracao
@@ -152,68 +169,81 @@ void CompilationEngine::compileClassVarDec() {
   nextToken();
 }
 
-void CompilationEngine::writeType() {
-  if (jt->tokenType() == tKEYWORD) {
-    switch (jt->keyword()) {
-      case kINT:
-        eat("int");
-        break;
+void CompilationEngine::writeType()
+{
+  if (jt->tokenType() == tKEYWORD)
+  {
+    switch (jt->keyword())
+    {
+    case kINT:
+      eat("int");
+      break;
 
-      case kCHAR:
-        eat("char");
-        break;
+    case kCHAR:
+      eat("char");
+      break;
 
-      case kBOOLEAN:
-        eat("boolean");
-        break;
+    case kBOOLEAN:
+      eat("boolean");
+      break;
 
-      default:
-        break;
+    default:
+      break;
     }
-
-  } else {
+  }
+  else
+  {
     writeTerminal(jt->tagToken());
   }
 }
 
-string CompilationEngine::getType() {
-  if (jt->tokenType() == tKEYWORD) {
-    switch (jt->keyword()) {
-      case kINT:
-        return "int";
-        break;
+string CompilationEngine::getType()
+{
+  if (jt->tokenType() == tKEYWORD)
+  {
+    switch (jt->keyword())
+    {
+    case kINT:
+      return "int";
+      break;
 
-      case kCHAR:
-        return "char";
-        break;
+    case kCHAR:
+      return "char";
+      break;
 
-      case kBOOLEAN:
-        return "boolean";
-        break;
+    case kBOOLEAN:
+      return "boolean";
+      break;
 
-      default:
-        break;
+    default:
+      return "NONE";
+      break;
     }
-
-  } else {
+  }
+  else
+  {
     return jt->currentToken;
   }
 }
 
-void CompilationEngine::compileSubroutine() {
+void CompilationEngine::compileSubroutine()
+{
   st->startSubroutine();
 
   tagNonTerminal("subroutineDec");
 
   subroutineType = jt->keyword();
 
-  if (jt->keyword() == kCONSTRUCTOR) {
+  if (jt->keyword() == kCONSTRUCTOR)
+  {
     eat("constructor");
-  } else if (jt->keyword() == kFUNCTION)
+  }
+  else if (jt->keyword() == kFUNCTION)
     eat("function");
-  else {
+  else
+  {
     st->define("this", className_,
-               ST::ARG);  // first argument of a method is always "this"
+               ST::ARG); // first argument of a method is always "this"
     eat("method");
   }
 
@@ -225,7 +255,7 @@ void CompilationEngine::compileSubroutine() {
     writeType();
 
   nextToken();
-  writeTerminal(jt->tagToken());  // identificador
+  writeTerminal(jt->tagToken()); // identificador
 
   currentFunctionName = className_ + "." + jt->currentToken;
 
@@ -240,13 +270,15 @@ void CompilationEngine::compileSubroutine() {
   untagNonTerminal("subroutineDec");
 }
 
-void CompilationEngine::compileParameterList() {
+void CompilationEngine::compileParameterList()
+{
   string name, type;
   ST::Kind kind = ST::ARG;
 
   tagNonTerminal("parameterList");
 
-  if (jt->tokenType() != tSYMBOL) {
+  if (jt->tokenType() != tSYMBOL)
+  {
     type = getType();
 
     writeType();
@@ -256,11 +288,10 @@ void CompilationEngine::compileParameterList() {
     st->define(name, type, kind);
 
     writeIdentifier();
-
-    // writeTerminal(jt->tagToken()); // identificador
     nextToken();
 
-    while (jt->tokenType() == tSYMBOL && jt->symbol() == ',') {
+    while (jt->tokenType() == tSYMBOL && jt->symbol() == ',')
+    {
       eat(",");
       nextToken();
 
@@ -273,41 +304,43 @@ void CompilationEngine::compileParameterList() {
       st->define(name, type, kind);
 
       writeIdentifier();
-      // writeTerminal(jt->tagToken()); // identificador
       nextToken();
     }
   }
 
   untagNonTerminal("parameterList");
 }
-void CompilationEngine::compileSubroutineBody() {
+void CompilationEngine::compileSubroutineBody()
+{
   tagNonTerminal("subroutineBody");
 
   eat("{");
   nextToken();
 
-  while (jt->tokenType() == tKEYWORD && jt->keyword() == kVAR) compileVarDec();
+  while (jt->tokenType() == tKEYWORD && jt->keyword() == kVAR)
+    compileVarDec();
 
   int nLocals = st->varCount(ST::VAR);
   vm->writeFunction(currentFunctionName, nLocals);
 
-  if (subroutineType == kCONSTRUCTOR) {
+  if (subroutineType == kCONSTRUCTOR)
+  {
     vm->writePush(CONST, st->varCount(ST::FIELD));
     vm->writeCall("Memory.alloc", 1);
     vm->writePop(POINTER, 0);
-
-  } else if (subroutineType == kMETHOD) {
-    vm->writePush(ARG, 0);     // push "this" of calling object
-    vm->writePop(POINTER, 0);  // set "this" of method to the calling object
   }
-
-  // cout << "apagar " << jt->currentToken << endl;
+  else if (subroutineType == kMETHOD)
+  {
+    vm->writePush(ARG, 0);    // push "this" of calling object
+    vm->writePop(POINTER, 0); // set "this" of method to the calling object
+  }
   compileStatements();
   eat("}");
   untagNonTerminal("subroutineBody");
   nextToken();
 }
-void CompilationEngine::compileVarDec() {
+void CompilationEngine::compileVarDec()
+{
   string name, type;
   ST::Kind kind = ST::VAR;
 
@@ -325,17 +358,16 @@ void CompilationEngine::compileVarDec() {
   st->define(name, type, kind);
 
   writeIdentifier();
-  // writeTerminal(jt->tagToken()); // identificador
   nextToken();
 
-  while (jt->tokenType() == tSYMBOL && jt->symbol() == ',') {
+  while (jt->tokenType() == tSYMBOL && jt->symbol() == ',')
+  {
     eat(",");
     nextToken();
     name = jt->currentToken;
     st->define(name, type, kind);
 
     writeIdentifier();
-    // writeTerminal(jt->tagToken()); // identificador
     nextToken();
   }
 
@@ -344,46 +376,49 @@ void CompilationEngine::compileVarDec() {
   nextToken();
 }
 
-bool CompilationEngine::isStatement(string token) {
+bool CompilationEngine::isStatement(string token)
+{
   return (token == "let" || token == "if" || token == "while" ||
           token == "do" || token == "return");
 }
 
-void CompilationEngine::compileStatements() {
+void CompilationEngine::compileStatements()
+{
   tagNonTerminal("statements");
 
-  while (jt->tokenType() == tKEYWORD && isStatement(jt->currentToken)) {
-    // cout << "statements " << jt->currentToken <<  endl;
-    switch (jt->keyword()) {
-      case kLET:
-        compileLet();
-        break;
+  while (jt->tokenType() == tKEYWORD && isStatement(jt->currentToken))
+  {
+    switch (jt->keyword())
+    {
+    case kLET:
+      compileLet();
+      break;
 
-      case kDO:
-        compileDo();
-        break;
+    case kDO:
+      compileDo();
+      break;
 
-      case kIF:
-        // cout << "if" << endl;
-        compileIf();
-        break;
+    case kIF:
+      compileIf();
+      break;
 
-      case kWHILE:
-        compileWhile();
-        break;
+    case kWHILE:
+      compileWhile();
+      break;
 
-      case kRETURN:
-        compileReturn();
-        break;
-      default:
-        break;
+    case kRETURN:
+      compileReturn();
+      break;
+    default:
+      break;
     }
   }
 
   untagNonTerminal("statements");
 }
 
-void CompilationEngine::compileDo() {
+void CompilationEngine::compileDo()
+{
   tagNonTerminal("doStatement");
   eat("do");
   nextToken();
@@ -394,7 +429,8 @@ void CompilationEngine::compileDo() {
   nextToken();
 }
 
-void CompilationEngine::compileLet() {
+void CompilationEngine::compileLet()
+{
   tagNonTerminal("letStatement");
   eat("let");
   nextToken();
@@ -402,11 +438,10 @@ void CompilationEngine::compileLet() {
   string lhsVar = jt->currentToken;
   bool isArray = false;
   writeIdentifier();
-
-  // writeTerminal(jt->tagToken()); // identificador
   nextToken();
 
-  if (jt->tokenType() == tSYMBOL && jt->symbol() == '[') {
+  if (jt->tokenType() == tSYMBOL && jt->symbol() == '[')
+  {
     eat("[");
     nextToken();
     vm->writePush(kind2Segment(st->kindOf(lhsVar)), st->indexOf(lhsVar));
@@ -420,13 +455,15 @@ void CompilationEngine::compileLet() {
   eat("=");
   nextToken();
   compileExpression();
-  if (isArray) {
-    vm->writePop(TEMP, 0);     // push result back onto stack
-    vm->writePop(POINTER, 1);  // pop address pointer into pointer 1
-    vm->writePush(TEMP, 0);    // push result back onto stack
-    vm->writePop(THAT, 0);     // Store right hand side evaluation in THAT 0.
-
-  } else {
+  if (isArray)
+  {
+    vm->writePop(TEMP, 0);    // push result back onto stack
+    vm->writePop(POINTER, 1); // pop address pointer into pointer 1
+    vm->writePush(TEMP, 0);   // push result back onto stack
+    vm->writePop(THAT, 0);    // Store right hand side evaluation in THAT 0.
+  }
+  else
+  {
     vm->writePop(kind2Segment(st->kindOf(lhsVar)), st->indexOf(lhsVar));
   }
 
@@ -435,13 +472,14 @@ void CompilationEngine::compileLet() {
   nextToken();
 }
 
-void CompilationEngine::compileWhile() {
+void CompilationEngine::compileWhile()
+{
   string labelTrue, labelFalse;
   labelTrue = "WHILETRUE" + to_string(labelNum);
   labelFalse = "WHILEFALSE" + to_string(labelNum);
   labelNum++;
 
-  vm->writeLabel(labelTrue);  // while true label to execute statements again
+  vm->writeLabel(labelTrue); // while true label to execute statements again
   tagNonTerminal("whileStatement");
   eat("while");
   nextToken();
@@ -455,9 +493,9 @@ void CompilationEngine::compileWhile() {
   eat("{");
   nextToken();
   compileStatements();
-  vm->writeGoto(labelTrue);  // Go back to labelTrue and check condition
+  vm->writeGoto(labelTrue); // Go back to labelTrue and check condition
   vm->writeLabel(
-      labelFalse);  // Breaks out of while loop because ~(condition) is true
+      labelFalse); // Breaks out of while loop because ~(condition) is true
 
   eat("}");
 
@@ -465,16 +503,20 @@ void CompilationEngine::compileWhile() {
   nextToken();
 }
 
-void CompilationEngine::compileReturn() {
+void CompilationEngine::compileReturn()
+{
   tagNonTerminal("returnStatement");
   eat("return");
   nextToken();
 
   if (jt->tokenType() != tSYMBOL ||
-      (jt->tokenType() == tSYMBOL && jt->symbol() != ';')) {
+      (jt->tokenType() == tSYMBOL && jt->symbol() != ';'))
+  {
     compileExpression();
     vm->writeReturn();
-  } else {
+  }
+  else
+  {
     vm->writePush(CONST, 0);
     vm->writeReturn();
   }
@@ -483,7 +525,8 @@ void CompilationEngine::compileReturn() {
   untagNonTerminal("returnStatement");
   nextToken();
 }
-void CompilationEngine::compileIf() {
+void CompilationEngine::compileIf()
+{
   string labelElse, labelContinue;
   labelElse = "IFFALSE" + to_string(labelNum);
   labelContinue = "CONTINUE" + to_string(labelNum);
@@ -508,7 +551,8 @@ void CompilationEngine::compileIf() {
   eat("}");
   nextToken();
   vm->writeLabel(labelElse);
-  if (jt->tokenType() == tKEYWORD && jt->keyword() == kELSE) {
+  if (jt->tokenType() == tKEYWORD && jt->keyword() == kELSE)
+  {
     eat("else");
     nextToken();
     eat("{");
@@ -522,200 +566,204 @@ void CompilationEngine::compileIf() {
   untagNonTerminal("ifStatement");
 }
 
-void CompilationEngine::compileExpression() {
+void CompilationEngine::compileExpression()
+{
   tagNonTerminal("expression");
   compileTerm();
 
-  while (jt->tokenType() == tSYMBOL && isOp(jt->symbol())) {
+  while (jt->tokenType() == tSYMBOL && isOp(jt->symbol()))
+  {
     char op = jt->symbol();
     writeTerminal(jt->tagToken());
     nextToken();
     compileTerm();
-
-    // falta os demais operadores
-    switch (op) {
-      case '+':
-        vm->writeArithmetic(ADD);
-        break;
-      case '-':
-        vm->writeArithmetic(SUB);
-        break;
-      case '*':
-        vm->writeCall("Math.multiply", 2);
-        break;
-      case '/':
-        vm->writeCall("Math.divide", 2);
-        break;
-      case '&':
-        vm->writeArithmetic(AND);
-        break;
-      case '|':
-        vm->writeArithmetic(OR);
-        break;
-      case '<':
-        vm->writeArithmetic(LT);
-        break;
-      case '>':
-        vm->writeArithmetic(GT);
-        break;
-      case '=':
-        vm->writeArithmetic(EQ);
-        break;
-      case '~':
-        vm->writeArithmetic(NOT);
-        break;
+    switch (op)
+    {
+    case '+':
+      vm->writeArithmetic(ADD);
+      break;
+    case '-':
+      vm->writeArithmetic(SUB);
+      break;
+    case '*':
+      vm->writeCall("Math.multiply", 2);
+      break;
+    case '/':
+      vm->writeCall("Math.divide", 2);
+      break;
+    case '&':
+      vm->writeArithmetic(AND);
+      break;
+    case '|':
+      vm->writeArithmetic(OR);
+      break;
+    case '<':
+      vm->writeArithmetic(LT);
+      break;
+    case '>':
+      vm->writeArithmetic(GT);
+      break;
+    case '=':
+      vm->writeArithmetic(EQ);
+      break;
+    case '~':
+      vm->writeArithmetic(NOT);
+      break;
     }
   }
 
   untagNonTerminal("expression");
 }
 
-void CompilationEngine::compileTerm() {
+void CompilationEngine::compileTerm()
+{
   tagNonTerminal("term");
 
   string id;
   string oldTok;
   string str_const;
 
-  switch (jt->tokenType()) {
-    case tINT_CONST:
-      vm->writePush(CONST, jt->intVal());
-      writeTerminal(jt->tagToken());
+  switch (jt->tokenType())
+  {
+  case tINT_CONST:
+    vm->writePush(CONST, jt->intVal());
+    writeTerminal(jt->tagToken());
+    break;
+
+  case tSTRING_CONST:
+    str_const = jt->stringVal();
+    vm->writePush(CONST, str_const.length());
+    vm->writeCall("String.new", 1);
+    for (int i = 0; i < str_const.length(); i++)
+    {
+      vm->writePush(CONST, (int)str_const[i]);
+      vm->writeCall("String.appendChar", 2);
+    }
+    writeTerminal(jt->tagToken());
+    break;
+
+  case tKEYWORD:
+    writeTerminal(jt->tagToken());
+
+    switch (jt->keyword())
+    {
+    case kTRUE:
+      vm->writePush(CONST, 0);
+      vm->writeArithmetic(NOT);
       break;
-
-    case tSTRING_CONST:
-      // cout << "string" << endl;
-      str_const = jt->stringVal();
-      vm->writePush(CONST, str_const.length());
-      vm->writeCall("String.new", 1);
-      for (int i = 0; i < str_const.length(); i++) {
-        vm->writePush(CONST, (int)str_const[i]);
-        vm->writeCall("String.appendChar", 2);
-      }
-      writeTerminal(jt->tagToken());
+    case kFALSE:
+      vm->writePush(CONST, 0);
       break;
-
-    case tKEYWORD:
-      writeTerminal(jt->tagToken());
-
-      switch (jt->keyword()) {
-        case kTRUE:
-          vm->writePush(CONST, 0);
-          vm->writeArithmetic(NOT);
-          break;
-        case kFALSE:
-          vm->writePush(CONST, 0);
-          break;
-        case kNULL:
-          vm->writePush(CONST, 0);
-          break;
-        case kTHIS:
-          vm->writePush(POINTER, 0);  // this refers to pointer 0
-          break;
-      }
+    case kNULL:
+      vm->writePush(CONST, 0);
       break;
+    case kTHIS:
+      vm->writePush(POINTER, 0); // this refers to pointer 0
+      break;
+    }
+    break;
 
-    case tIDENTIFIER:
+  case tIDENTIFIER:
 
-      id = jt->currentToken;  // save current token
-      // cout << "identidicador: " << id << endl;
+    id = jt->currentToken; // save current token
+    nextToken();
+
+    if (jt->tokenType() == tSYMBOL && jt->symbol() == '[')
+    {
+      oldTok = jt->currentToken;
+      jt->currentToken = id;
+      writeIdentifier();
+      jt->currentToken = oldTok;
+
+      eat("[");
       nextToken();
+      compileExpression();
+      vm->writePush(kind2Segment(st->kindOf(id)), st->indexOf(id));
+      vm->writeArithmetic(ADD);
 
-      if (jt->tokenType() == tSYMBOL && jt->symbol() == '[') {
-        oldTok = jt->currentToken;
-        jt->currentToken = id;
-        // writeTerminal(jt->tagToken());
-        writeIdentifier();
-        jt->currentToken = oldTok;
+      eat("]");
+      vm->writePop(POINTER, 1); // pop address pointer into pointer 1
+      vm->writePush(
+          THAT, 0); // push the value of the address pointer back onto stack
+      nextToken();
+    }
+    else if (jt->tokenType() == tSYMBOL &&
+             (jt->symbol() == '.' || jt->symbol() == '('))
+    {
+      cout << "subrotina " << id << endl;
 
-        eat("[");
-        nextToken();
-        compileExpression();
-        // cout << id << endl;
-        vm->writePush(kind2Segment(st->kindOf(id)), st->indexOf(id));
-        vm->writeArithmetic(ADD);
+      compileSubroutineCall(id);
+    }
+    else
+    {
+      oldTok = jt->currentToken;
+      jt->currentToken = id;
+      vm->writePush(kind2Segment(st->kindOf(id)), st->indexOf(id));
+      writeIdentifier();
+      jt->currentToken = oldTok;
+    }
 
-        eat("]");
-        vm->writePop(POINTER, 1);  // pop address pointer into pointer 1
-        vm->writePush(
-            THAT, 0);  // push the value of the address pointer back onto stack
-        nextToken();
+    untagNonTerminal("term");
+    return; // has already advanced
+    break;
 
-      } else if (jt->tokenType() == tSYMBOL &&
-                 (jt->symbol() == '.' || jt->symbol() == '(')) {
-        cout << "subrotina " << id << endl;
+  case tSYMBOL:
+    if (jt->symbol() == '(')
+    { // '(' expression ')'
 
-        compileSubroutineCall(id);
+      eat("(");
+      nextToken();
+      compileExpression();
+      eat(")");
+    }
+    else
+    { // unaryOp term
 
-      } else {
-        oldTok = jt->currentToken;
-        jt->currentToken = id;
-        // writeTerminal(jt->tagToken());
-        vm->writePush(kind2Segment(st->kindOf(id)), st->indexOf(id));
-        writeIdentifier();
-        jt->currentToken = oldTok;
+      char uOp = jt->symbol();
+      cout << "unario" << endl;
+
+      writeTerminal(jt->tagToken());
+      nextToken();
+      compileTerm();
+
+      switch (uOp)
+      {
+      case '-':
+        vm->writeArithmetic(NEG);
+        break;
+      case '~':
+        vm->writeArithmetic(NOT);
+        break;
+      default:
+        cerr << "unario nao reconhecid" << endl;
+        break;
       }
 
       untagNonTerminal("term");
-      return;  // has already advanced
-      break;
+      return; // has already advanced
+    }
 
-    case tSYMBOL:
-      // cout << "simbolo" << endl;
-      if (jt->symbol() == '(') {  // '(' expression ')'
+    break;
 
-        eat("(");
-        nextToken();
-        // cout << "expressao " << endl;
-        compileExpression();
-        // cout << "expressao 2" << endl;
-        eat(")");
-
-      } else {  // unaryOp term
-
-        char uOp = jt->symbol();
-        cout << "unario" << endl;
-
-        // falta tratar o operadore unario
-
-        writeTerminal(jt->tagToken());
-        nextToken();
-        compileTerm();
-
-        switch (uOp) {
-          case '-':
-            vm->writeArithmetic(NEG);
-            break;
-          case '~':
-            vm->writeArithmetic(NOT);
-            break;
-          default:
-            cerr << "unario nao reconhecid" << endl;
-            break;
-        }
-
-        untagNonTerminal("term");
-        return;  // has already advanced
-      }
-
-      break;
-
-    default:
-      break;
+  default:
+    break;
   }
 
   nextToken();
   untagNonTerminal("term");
 }
 
-void CompilationEngine::compileExpressionList() {
+void CompilationEngine::compileExpressionList()
+{
   tagNonTerminal("expressionList");
   numArgs = 0;
 
-  if (jt->tokenType() != tSYMBOL || (jt->symbol() == '(')) compileExpression();
+  if (jt->tokenType() != tSYMBOL || (jt->symbol() == '('))
+    compileExpression();
   numArgs++;
 
-  while (jt->tokenType() == tSYMBOL && jt->symbol() == ',') {
+  while (jt->tokenType() == tSYMBOL && jt->symbol() == ',')
+  {
     eat(",");
     nextToken();
     numArgs++;
@@ -725,36 +773,34 @@ void CompilationEngine::compileExpressionList() {
   untagNonTerminal("expressionList");
 }
 
-void CompilationEngine::compileSubroutineCall(string subName) {
+void CompilationEngine::compileSubroutineCall(string subName)
+{
   string oldTok = jt->currentToken;
   jt->currentToken = subName;
-  writeTerminal(jt->tagToken());  // identificador
+  writeTerminal(jt->tagToken()); // identificador
 
   string fname = jt->currentToken;
-
-  cout << "aqui " << subName << endl;
-  // vm->writeCall (fname,2);
-
   jt->currentToken = oldTok;
 
-  if (jt->tokenType() == tSYMBOL && jt->symbol() == '(') {
+  if (jt->tokenType() == tSYMBOL && jt->symbol() == '(')
+  {
     eat("(");
     nextToken();
     compileExpressionList();
     vm->writeCall(fname, numArgs);
     eat(")");
-
-  } else {
+  }
+  else
+  {
     eat(".");
     nextToken();
 
     fname = fname + "." + jt->currentToken;
 
-    writeTerminal(jt->tagToken());  // identificador
+    writeTerminal(jt->tagToken()); // identificador
     nextToken();
     eat("(");
     nextToken();
-    // vm->writeCall ("apagar",0);
     compileExpressionList();
 
     eat(")");
@@ -762,23 +808,24 @@ void CompilationEngine::compileSubroutineCall(string subName) {
   vm->writeCall(fname, numArgs);
   nextToken();
 }
-void CompilationEngine::compileSubroutineCall() {
-  writeTerminal(jt->tagToken());  // identificador
-
+void CompilationEngine::compileSubroutineCall()
+{
+  writeTerminal(jt->tagToken()); // identificador
   string fname = jt->currentToken;
-
   nextToken();
 
-  if (jt->tokenType() == tSYMBOL && jt->symbol() == '(') {
+  if (jt->tokenType() == tSYMBOL && jt->symbol() == '(')
+  {
     eat("(");
     nextToken();
     compileExpressionList();
     eat(")");
-
-  } else {
+  }
+  else
+  {
     eat(".");
     nextToken();
-    writeTerminal(jt->tagToken());  // identificador
+    writeTerminal(jt->tagToken()); // identificador
     fname = fname + "." + jt->currentToken;
     nextToken();
     eat("(");
@@ -792,11 +839,13 @@ void CompilationEngine::compileSubroutineCall() {
 
 void CompilationEngine::writeTerminal(string terminal) { write(terminal); }
 
-void CompilationEngine::tagNonTerminal(string nonTerminal) {
+void CompilationEngine::tagNonTerminal(string nonTerminal)
+{
   write("<" + nonTerminal + ">");
 }
 
-void CompilationEngine::untagNonTerminal(string nonTerminal) {
+void CompilationEngine::untagNonTerminal(string nonTerminal)
+{
   write("</" + nonTerminal + ">");
 }
 

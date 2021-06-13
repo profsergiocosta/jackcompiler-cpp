@@ -5,19 +5,29 @@
 #include <string>
 using namespace std;
 
-namespace ST {
+namespace ST
+{
 
-enum Kind { STATIC, FIELD, ARG, VAR, NONE };
+  enum Kind
+  {
+    STATIC,
+    FIELD,
+    ARG,
+    VAR,
+    NONE
+  };
 };
 
-struct Symbol {
+struct Symbol
+{
   string type;
   ST::Kind kind;
   int index;
 };
 
-class SymbolTable {
- public:
+class SymbolTable
+{
+public:
   // Constructor
   SymbolTable();
 
@@ -30,9 +40,9 @@ class SymbolTable {
   int indexOf(string name);
   string fromKind(ST::Kind k);
 
-  bool lookup(string name, Symbol& s);
+  bool lookup(string name, Symbol &s);
 
- private:
+private:
   map<string, Symbol> class_scope_;
   map<string, Symbol> subroutine_scope_;
   int count[4];

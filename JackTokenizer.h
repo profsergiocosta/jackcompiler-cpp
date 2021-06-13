@@ -7,7 +7,8 @@
 
 using namespace std;
 
-enum TokenType {
+enum TokenType
+{
   tKEYWORD,      /**< a keyword */
   tSYMBOL,       /**< a symbol */
   tIDENTIFIER,   /**< an identifier */
@@ -16,7 +17,8 @@ enum TokenType {
   tUNKNOWN       /**< unknown type */
 };
 
-enum Keyword {
+enum Keyword
+{
   kCLASS,       /**< class */
   kMETHOD,      /**< method */
   kFUNCTION,    /**< function */
@@ -41,8 +43,9 @@ enum Keyword {
   kUNKNOWN      /**< unknow */
 };
 
-class JackTokenizer {
- public:
+class JackTokenizer
+{
+public:
   JackTokenizer(string fname);
   void advance();
   bool hasMoreTokens();
@@ -52,7 +55,6 @@ class JackTokenizer {
   Keyword keyword();
 
   char symbol();
-
   string identifier();
 
   int intVal();
@@ -62,13 +64,9 @@ class JackTokenizer {
   bool isSymbol(char t);
   bool isSymbol(string t);
   bool isKeyword(string t);
-
   bool isStringConst(string t);
-
   bool isIntConst(string t);
-
   bool isIdentifier(string t);
-  // privados
 
   string tagToken();
 
@@ -85,4 +83,4 @@ class JackTokenizer {
   std::set<string> keywords;
 };
 
-#endif  // JACK_TOKENIZER_H
+#endif // JACK_TOKENIZER_H

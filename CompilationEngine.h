@@ -9,11 +9,12 @@
 
 using namespace std;
 
-class CompilationEngine {
- public:
+class CompilationEngine
+{
+public:
   CompilationEngine(string inFileName, string outFileName);
   void nextToken();
-  bool compile();
+  void compile();
   void compileClass();
   void compileClassVarDec();
   void compileSubroutine();
@@ -46,10 +47,10 @@ class CompilationEngine {
   string getType();
 
   // privados
-  JackTokenizer* jt;
+  JackTokenizer *jt;
   ofstream out;
-  SymbolTable* st;
-  VMWriter* vm;
+  SymbolTable *st;
+  VMWriter *vm;
 
   string className_;
   int numArgs;
