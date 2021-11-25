@@ -3,6 +3,7 @@
 #include "token.h"
 
 #include <map>
+#include <set>
 #include <cstring>
 //#include <string.h>
 #include <string>
@@ -32,6 +33,14 @@ std::map<std::string, TokenType>
         {"else", TOKEN_ELSE},
         {"while", TOKEN_WHILE},
         {"return", TOKEN_RETURN},
+};
+
+std::set<TokenType> statements{
+    TOKEN_LET,
+    TOKEN_IF,
+    TOKEN_WHILE,
+    TOKEN_DO,
+    TOKEN_RETURN,
 };
 
 std::string tokenLiteral(Token tk)
@@ -88,6 +97,12 @@ bool isAlpha(char c)
     return (c >= 'a' && c <= 'z') ||
            (c >= 'A' && c <= 'Z') ||
            c == '_';
+}
+
+bool isStatement(TokenType t)
+{
+
+    return statements.find(t) != statements.end();
 }
 
 std::string tagToken(Token tk)

@@ -24,7 +24,10 @@ void CompilationEngine::compile()
 {
 
     //compileClass();
-    compileLet();
+    //compileLet();
+    compileStatements();
+
+    expectPeek(TOKEN_EOF); // realmente acabou o programa
 }
 
 void CompilationEngine::compileClass()
@@ -41,6 +44,35 @@ void CompilationEngine::compileClass()
     expectPeek(TOKEN_RBRACE);
 
     printNonTerminal("/class", toPrint);
+}
+
+void CompilationEngine::compileStatements()
+{
+    printNonTerminal("statements", toPrint);
+    while (isStatement(peekToken.type))
+    {
+        compileStatement();
+    }
+    printNonTerminal("/statements", toPrint);
+}
+
+void CompilationEngine::compileStatement()
+{
+    switch (peekToken.type)
+    {
+    case TOKEN_LET:
+        return compileLet();
+    case TOKEN_WHILE:
+        return compileWhile();
+    case TOKEN_IF:
+        return compileIf();
+    case TOKEN_DO:
+        return compileDo();
+    case TOKEN_RETURN:
+        return compileReturn();
+    default:
+        return;
+    }
 }
 
 void CompilationEngine::compileLet()
@@ -66,6 +98,85 @@ void CompilationEngine::compileLet()
     expectPeek(TOKEN_SEMICOLON);
 
     printNonTerminal("/letStatement", toPrint);
+}
+
+void CompilationEngine::compileDo()
+{
+    printNonTerminal("doStatement", toPrint);
+    expectPeek(TOKEN_DO);
+
+    expectPeek(TOKEN_IDENT);
+
+    expectPeek(TOKEN_SEMICOLON);
+
+    printNonTerminal("/doStatement", toPrint);
+}
+
+void CompilationEngine::compileWhile()
+{
+    printNonTerminal("whileStatement", toPrint);
+    expectPeek(TOKEN_WHILE);
+
+    expectPeek(TOKEN_LPAREN);
+
+    compileExpression();
+
+    expectPeek(TOKEN_RPAREN);
+
+    expectPeek(TOKEN_LBRACE);
+
+    compileStatements();
+
+    expectPeek(TOKEN_RBRACE);
+
+    printNonTerminal("/whileStatement", toPrint);
+}
+void CompilationEngine::compileReturn()
+{
+    printNonTerminal("returnStatement", toPrint);
+
+    expectPeek(TOKEN_RETURN);
+
+    compileExpression();
+
+    expectPeek(TOKEN_SEMICOLON);
+
+    printNonTerminal("/returnStatement", toPrint);
+}
+void CompilationEngine::compileIf()
+{
+    printNonTerminal("ifStatement", toPrint);
+
+    expectPeek(TOKEN_IF);
+
+    expectPeek(TOKEN_LPAREN);
+
+    compileExpression();
+
+    expectPeek(TOKEN_RPAREN);
+
+    expectPeek(TOKEN_LBRACE);
+
+    compileStatements();
+
+    expectPeek(TOKEN_RBRACE);
+
+    if (peekTokenIs(TOKEN_ELSE))
+    {
+        expectPeek(TOKEN_ELSE);
+
+        expectPeek(TOKEN_LBRACE);
+
+        compileStatements();
+
+        expectPeek(TOKEN_RBRACE);
+    }
+
+    printNonTerminal("/ifStatement", toPrint);
+}
+
+void CompilationEngine::compileSubroutineCall()
+{
 }
 
 void CompilationEngine::compileExpression()

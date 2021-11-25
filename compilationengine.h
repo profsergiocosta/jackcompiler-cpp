@@ -21,6 +21,7 @@ public:
     void compileParameterList();
     void compileSubroutineBody();
     void compileVarDec();
+    void compileStatement();
     void compileStatements();
     void compileDo();
     void compileLet();

@@ -48,6 +48,8 @@ enum TokenType
     TOKEN_LET,
     TOKEN_IF,
     TOKEN_WHILE,
+    TOKEN_DO,
+    TOKEN_RETURN,
     TOKEN_CONSTRUCTOR,
     TOKEN_FIELD,
     TOKEN_VAR,
@@ -55,9 +57,8 @@ enum TokenType
     TOKEN_VOID,
     TOKEN_CLASS,
     TOKEN_FALSE,
-    TOKEN_DO,
+
     TOKEN_ELSE,
-    TOKEN_RETURN,
     TOKEN_FUNCTION,
     TOKEN_THIS,
 };
@@ -76,6 +77,7 @@ bool isSymbol(char c);
 bool isOperator(char c);
 
 bool isKeyword(std::string key);
+bool isStatement(TokenType t);
 
 TokenType keywordType(std::string key);
 
