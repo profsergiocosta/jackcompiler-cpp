@@ -1,14 +1,15 @@
 
 #include <iostream>
 
-#include "JackTokenizer.h"
+#include "jacktokenizer.h"
+#include "compilationengine.h"
+
 #include "token.h"
 
 using namespace std;
 
-int main()
+void printXML()
 {
-
     JackTokenizer *tkz = new JackTokenizer("Main.jack");
 
     cout << "<tokens>" << endl;
@@ -19,6 +20,12 @@ int main()
             cout << tagToken(tk) << endl;
     }
     cout << "</tokens>" << endl;
+}
+
+int main()
+{
+    CompilationEngine *compiler = new CompilationEngine("Main.jack");
+    compiler->compile();
 
     return 0;
 }

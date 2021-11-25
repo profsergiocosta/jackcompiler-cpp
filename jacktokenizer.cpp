@@ -6,7 +6,7 @@
 
 #include <iostream>
 
-#include "JackTokenizer.h"
+#include "jacktokenizer.h"
 #include "token.h"
 
 using namespace std;
