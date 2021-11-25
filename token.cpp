@@ -75,6 +75,14 @@ bool isSymbol(char c)
     return strchr(symbols, c) != NULL;
 }
 
+bool isOperator(char c)
+{
+
+    char operators[] = "+-*/&|";
+
+    return strchr(operators, c) != NULL;
+}
+
 bool isAlpha(char c)
 {
     return (c >= 'a' && c <= 'z') ||

@@ -73,6 +73,8 @@ typedef struct
 bool isDigit(char c);
 bool isAlpha(char c);
 bool isSymbol(char c);
+bool isOperator(char c);
+
 bool isKeyword(std::string key);
 
 TokenType keywordType(std::string key);

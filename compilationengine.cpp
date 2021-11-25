@@ -52,6 +52,13 @@ void CompilationEngine::compileLet()
 
     expectPeek(TOKEN_IDENT);
 
+    while (peekTokenIs(TOKEN_LBRACKET))
+    {
+        expectPeek(TOKEN_LBRACKET);
+        compileExpression();
+        expectPeek(TOKEN_RBRACKET);
+    }
+
     expectPeek(TOKEN_EQ);
 
     compileExpression();
@@ -66,6 +73,13 @@ void CompilationEngine::compileExpression()
     printNonTerminal("expression", toPrint);
 
     compileTerm();
+
+    while (isOperator(*peekToken.start))
+    {
+        nextToken();
+        printTerminal(curToken, toPrint); // operator
+        compileTerm();
+    }
 
     printNonTerminal("/expression", toPrint);
 }
