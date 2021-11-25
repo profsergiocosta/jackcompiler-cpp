@@ -77,6 +77,10 @@ bool isKeyword(std::string key);
 
 TokenType keywordType(std::string key);
 
+void printTerminal(Token tok, bool toPrint);
+
+void printNonTerminal(std::string nonTerminal, bool toPrint);
+
 std::string tokenLiteral(Token tk);
 std::string tagToken(Token tk);
 

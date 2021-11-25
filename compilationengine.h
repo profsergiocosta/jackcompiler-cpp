@@ -40,6 +40,8 @@ private:
 
     JackTokenizer *jt;
 
+    bool toPrint;
+
     Token curToken;
     Token peekToken;
 };

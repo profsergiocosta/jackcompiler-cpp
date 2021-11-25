@@ -11,6 +11,7 @@ CompilationEngine::CompilationEngine(const char *inFileName)
 {
     jt = new JackTokenizer(inFileName);
     nextToken();
+    toPrint = true;
 }
 
 void CompilationEngine::nextToken()
@@ -23,7 +24,18 @@ void CompilationEngine::compile() { compileClass(); }
 
 void CompilationEngine::compileClass()
 {
+
+    printNonTerminal("class", toPrint);
+
     expectPeek(TOKEN_CLASS);
+
+    expectPeek(TOKEN_IDENT);
+
+    expectPeek(TOKEN_LBRACE);
+
+    expectPeek(TOKEN_RBRACE);
+
+    printNonTerminal("/class", toPrint);
 }
 
 bool CompilationEngine::peekTokenIs(TokenType t)
@@ -36,7 +48,8 @@ void CompilationEngine::expectPeek(TokenType t)
     if (peekTokenIs(t))
     {
         nextToken();
-        cout << tagToken(curToken) << endl;
+
+        printTerminal(curToken, toPrint);
     }
     else
     {

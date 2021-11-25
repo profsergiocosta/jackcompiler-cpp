@@ -132,3 +132,19 @@ std::string tagToken(Token tk)
         return "<ilegal> " + literal + " </ilegal>";
     }
 }
+
+void printTerminal(Token tok, bool toPrint)
+{
+    if (toPrint && tok.type != TOKEN_EOF)
+    {
+        std::cout << tagToken(tok) << std::endl;
+    }
+}
+
+void printNonTerminal(std::string nonTerminal, bool toPrint)
+{
+    if (toPrint)
+    {
+        std::cout << "<" << nonTerminal << ">" << std::endl;
+    }
+}
