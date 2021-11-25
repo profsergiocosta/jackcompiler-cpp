@@ -20,7 +20,12 @@ void CompilationEngine::nextToken()
     peekToken = jt->nextToken();
 }
 
-void CompilationEngine::compile() { compileClass(); }
+void CompilationEngine::compile()
+{
+
+    //compileClass();
+    compileLet();
+}
 
 void CompilationEngine::compileClass()
 {
@@ -36,6 +41,52 @@ void CompilationEngine::compileClass()
     expectPeek(TOKEN_RBRACE);
 
     printNonTerminal("/class", toPrint);
+}
+
+void CompilationEngine::compileLet()
+{
+
+    printNonTerminal("letStatement", toPrint);
+
+    expectPeek(TOKEN_LET);
+
+    expectPeek(TOKEN_IDENT);
+
+    expectPeek(TOKEN_EQ);
+
+    compileExpression();
+
+    expectPeek(TOKEN_SEMICOLON);
+
+    printNonTerminal("/letStatement", toPrint);
+}
+
+void CompilationEngine::compileExpression()
+{
+    printNonTerminal("expression", toPrint);
+
+    compileTerm();
+
+    printNonTerminal("/expression", toPrint);
+}
+
+void CompilationEngine::compileTerm()
+{
+    switch (peekToken.type)
+    {
+    case TOKEN_NUMBER:
+    case TOKEN_STRING:
+    case TOKEN_TRUE:
+    case TOKEN_FALSE:
+    case TOKEN_NULL:
+    case TOKEN_THIS:
+    case TOKEN_IDENT:
+        nextToken();
+        printTerminal(curToken, toPrint);
+        break;
+    default:
+        peekError(TOKEN_IDENT); // provisorio
+    }
 }
 
 bool CompilationEngine::peekTokenIs(TokenType t)
