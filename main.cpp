@@ -2,18 +2,23 @@
 #include <iostream>
 
 #include "JackTokenizer.h"
+#include "token.h"
 
 using namespace std;
 
 int main()
 {
 
-    JackTokenizer *tkz = new JackTokenizer("teste.jack");
-    char c;
-    while ((c = tkz->nextToken()) != '\0')
+    JackTokenizer *tkz = new JackTokenizer("Main.jack");
+
+    cout << "<tokens>" << endl;
+    while (tkz->hasMoreTokens())
     {
-        cout << c << endl;
+        Token tk = tkz->nextToken();
+        if (tk.type != TOKEN_EOF)
+            cout << tagToken(tk) << endl;
     }
+    cout << "</tokens>" << endl;
 
     return 0;
 }

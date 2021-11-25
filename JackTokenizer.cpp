@@ -1,10 +1,13 @@
 
-#include "JackTokenizer.h"
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <iostream>
+
+#include "JackTokenizer.h"
+#include "token.h"
 
 using namespace std;
 
@@ -51,18 +54,19 @@ JackTokenizer::JackTokenizer(const char *path)
     line = 1;
 }
 
-bool JackTokenizer::isDigit()
+Token JackTokenizer::errorToken(const char *message)
 {
-    char c = peek();
-    return *current >= '0' && c <= '9';
+    Token token;
+    token.type = TOKEN_ILLEGAL;
+    token.start = message;
+    token.length = (int)strlen(message);
+    token.line = line;
+    return token;
 }
 
-bool JackTokenizer::isAlpha()
+bool JackTokenizer::hasMoreTokens()
 {
-    char c = peek();
-    return (c >= 'a' && c <= 'z') ||
-           (c >= 'A' && c <= 'Z') ||
-           c == '_';
+    return !isAtEnd();
 }
 
 bool JackTokenizer::isAtEnd()
@@ -139,11 +143,139 @@ void JackTokenizer::skipWhitespace()
     }
 }
 
-char JackTokenizer::nextToken()
+Token JackTokenizer::nextToken()
 {
 
     skipWhitespace();
-    return nextChar();
+    start = current;
+
+    if (isAtEnd())
+        return newToken(TOKEN_EOF);
+
+    char c = nextChar();
+
+    if (c == '"')
+        return tkstring();
+
+    if (isDigit(c))
+        return number();
+
+    if (isSymbol(c))
+        return symbol();
+
+    if (isAlpha(c))
+        return identifier();
+
+    return newToken(TOKEN_EOF);
+}
+
+Token JackTokenizer::number()
+{
+
+    while (isDigit(peek()))
+        nextChar();
+
+    // Look for a fractional part.
+    if (peek() == '.' && isDigit(peekNext()))
+    {
+        // Consume the ".".
+        nextChar();
+
+        while (isDigit(peek()))
+            nextChar();
+    }
+
+    return newToken(TOKEN_NUMBER);
+}
+
+Token JackTokenizer::identifier()
+{
+    while (isAlpha(peek()) || isDigit(peek()))
+        nextChar();
+
+    Token tk = newToken(TOKEN_IDENT);
+
+    string literal = tokenLiteral(tk);
+    if (isKeyword(literal))
+    {
+        tk.type = keywordType(literal);
+    }
+
+    return tk;
+}
+
+Token JackTokenizer::tkstring()
+{
+    while (peek() != '"' && !isAtEnd())
+    {
+        if (peek() == '\n')
+            line++;
+        nextChar();
+    }
+
+    if (isAtEnd())
+        return errorToken("Unterminated string.");
+
+    // The closing quote.
+    nextChar();
+    return newToken(TOKEN_STRING);
+}
+
+Token JackTokenizer::symbol()
+{
+    char c = *start;
+    switch (c)
+    {
+    case '(':
+        return newToken(TOKEN_LPAREN);
+    case ')':
+        return newToken(TOKEN_RPAREN);
+    case '{':
+        return newToken(TOKEN_LBRACE);
+    case '}':
+        return newToken(TOKEN_RBRACE);
+    case '[':
+        return newToken(TOKEN_LBRACKET);
+    case ']':
+        return newToken(TOKEN_RBRACKET);
+    case ';':
+        return newToken(TOKEN_SEMICOLON);
+    case ',':
+        return newToken(TOKEN_COMMA);
+    case '.':
+        return newToken(TOKEN_DOT);
+    case '-':
+        return newToken(TOKEN_MINUS);
+    case '+':
+        return newToken(TOKEN_PLUS);
+    case '/':
+        return newToken(TOKEN_SLASH);
+    case '*':
+        return newToken(TOKEN_ASTERISK);
+    case '&':
+        return newToken(TOKEN_AND);
+    case '|':
+        return newToken(TOKEN_OR);
+    case '~':
+        return newToken(TOKEN_NOT);
+    case '<':
+        return newToken(TOKEN_GT);
+    case '=':
+        return newToken(TOKEN_EQ);
+
+    default:
+        return newToken(TOKEN_ILLEGAL);
+    }
+}
+
+Token JackTokenizer::newToken(TokenType type)
+{
+    Token token;
+    token.type = type;
+    token.start = start;
+    token.length = (int)(current - start);
+    token.line = line;
+    return token;
 }
 
 JackTokenizer::~JackTokenizer()
