@@ -23,11 +23,11 @@ void CompilationEngine::nextToken()
 void CompilationEngine::compile()
 {
 
-    //compileClass();
+    compileClass();
     //compileLet();
     //compileStatements();
     //compileSubroutineBody();
-    compileSubroutineDec();
+    //compileSubroutineDec();
 
     expectPeek(TOKEN_EOF); // realmente acabou o programa
 }
@@ -42,6 +42,11 @@ void CompilationEngine::compileClass()
     expectPeek(TOKEN_IDENT);
 
     expectPeek(TOKEN_LBRACE);
+
+    while (peekTokenIs(TOKEN_FUNCTION) || peekTokenIs(TOKEN_CONSTRUCTOR) || peekTokenIs(TOKEN_METHOD))
+    {
+        compileSubroutineDec();
+    }
 
     expectPeek(TOKEN_RBRACE);
 
