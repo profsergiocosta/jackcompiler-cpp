@@ -1,34 +1,99 @@
 // This file is part of www.nand2tetris.org
 // and the book "The Elements of Computing Systems"
 // by Nisan and Schocken, MIT Press.
-// File name: projects/10/ExpressionLessSquare/Main.jack
+/// File name: projects/10/ExpressionLessSquare/Square.jack
 
-/** Expressionless version of projects/10/Square/Main.jack. */
+/** Expressionless version of projects/10/Square/Square.jack. */
 
-class Main {
+class Square {
 
-    function void main() {
-        var SquareGame game;
-        let game = game;
-        do game.run();
-        do game.dispose();
-        return;
-    }
+   field int x, y; 
+   field int size; 
 
-    function void test() {  // Added to test Jack syntax that is not use in
-        var int i, j;       // the Square files.
-        var String s;
-        var Array a;
-        if (i) {
-            let s = i;
-            let s = j;
-            let a[i] = j;
-        }
-        else {              // There is no else keyword in the Square files.
-            let i = i;
-            let j = j;
-            let i = i | j;
-        }
-        return;
-    }
-}
+   constructor Square new(int Ax, int Ay, int Asize) {
+      let x = Ax;
+      let y = Ay;
+      let size = Asize;
+      do draw();
+      return x;
+   }
+
+   method void dispose() {
+      do Memory.deAlloc(this);
+      return;
+   }
+
+   method void draw() {
+      do Screen.setColor(x);
+      do Screen.drawRectangle(x, y, x, y);
+      return;
+   }
+
+   method void erase() {
+      do Screen.setColor(x);
+      do Screen.drawRectangle(x, y, x, y);
+      return;
+   }
+
+   method void incSize() {
+      if (x) {
+         do erase();
+         let size = size;
+         do draw();
+      }
+      return;
+   }
+
+   method void decSize() {
+      if (size) {
+         do erase();
+         let size = size;
+         do draw();
+      }
+      return;
+   }
+
+   method void moveUp() {
+      if (y) {
+         do Screen.setColor(x);
+         do Screen.drawRectangle(x, y, x, y);
+         let y = y;
+         do Screen.setColor(x);
+         do Screen.drawRectangle(x, y, x, y);
+      }
+      return;
+   }
+
+   method void moveDown() {
+      if (y) {
+         do Screen.setColor(x);
+         do Screen.drawRectangle(x, y, x, y);
+         let y = y;
+         do Screen.setColor(x);
+         do Screen.drawRectangle(x, y, x, y);
+      }
+      return;
+   }
+
+   method void moveLeft() {
+      if (x) {
+         do Screen.setColor(x);
+         do Screen.drawRectangle(x, y, x, y);
+         let x = x;
+         do Screen.setColor(x);
+         do Screen.drawRectangle(x, y, x, y);
+      }
+      return;
+   }
+
+   method void moveRight() {
+      if (x) {
+         do Screen.setColor(x);
+         do Screen.drawRectangle(x, y, x, y);
+         let x = x;
+         do Screen.setColor(x);
+         do Screen.drawRectangle(x, y, x, y);
+      }
+      return;
+   }
+}  

@@ -43,6 +43,11 @@ void CompilationEngine::compileClass()
 
     expectPeek(TOKEN_LBRACE);
 
+    while (peekTokenIs(TOKEN_STATIC) || peekTokenIs(TOKEN_FIELD))
+    {
+        compileClassVarDec();
+    }
+
     while (peekTokenIs(TOKEN_FUNCTION) || peekTokenIs(TOKEN_CONSTRUCTOR) || peekTokenIs(TOKEN_METHOD))
     {
         compileSubroutineDec();
@@ -51,6 +56,34 @@ void CompilationEngine::compileClass()
     expectPeek(TOKEN_RBRACE);
 
     printNonTerminal("/class", toPrint);
+}
+
+void CompilationEngine::compileClassVarDec()
+{
+
+    printNonTerminal("classVarDec", toPrint);
+
+    if (peekTokenIs(TOKEN_FIELD))
+    {
+        expectPeek(TOKEN_FIELD);
+    }
+    else
+    {
+        expectPeek(TOKEN_STATIC);
+    }
+
+    compileType();
+    expectPeek(TOKEN_IDENT);
+
+    while (peekTokenIs(TOKEN_COMMA))
+    {
+        expectPeek(TOKEN_COMMA);
+        expectPeek(TOKEN_IDENT);
+    }
+
+    expectPeek(TOKEN_SEMICOLON);
+
+    printNonTerminal("/classVarDec", toPrint);
 }
 
 void CompilationEngine::compileSubroutineDec()
@@ -273,7 +306,7 @@ void CompilationEngine::compileSubroutineCall()
 void CompilationEngine::compileExpressionList()
 {
 
-    printNonTerminal("ExpressionList", toPrint);
+    printNonTerminal("expressionList", toPrint);
 
     if (!peekTokenIs(TOKEN_RPAREN))
     {
@@ -286,7 +319,7 @@ void CompilationEngine::compileExpressionList()
         compileExpression();
     }
 
-    printNonTerminal("/ExpressionList", toPrint);
+    printNonTerminal("/expressionList", toPrint);
 }
 
 void CompilationEngine::compileWhile()
@@ -371,6 +404,8 @@ void CompilationEngine::compileExpression()
 
 void CompilationEngine::compileTerm()
 {
+    printNonTerminal("term", toPrint);
+
     switch (peekToken.type)
     {
     case TOKEN_NUMBER:
@@ -386,6 +421,7 @@ void CompilationEngine::compileTerm()
     default:
         peekError(TOKEN_IDENT); // provisorio
     }
+    printNonTerminal("/term", toPrint);
 }
 
 bool CompilationEngine::peekTokenIs(TokenType t)
