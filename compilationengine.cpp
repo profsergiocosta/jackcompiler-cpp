@@ -23,6 +23,7 @@ void CompilationEngine::nextToken()
 void CompilationEngine::compile()
 {
 
+    //compileExpression();
     compileClass();
     //compileLet();
     //compileStatements();
@@ -414,12 +415,42 @@ void CompilationEngine::compileTerm()
     case TOKEN_FALSE:
     case TOKEN_NULL:
     case TOKEN_THIS:
-    case TOKEN_IDENT:
         nextToken();
         printTerminal(curToken, toPrint);
         break;
+    case TOKEN_IDENT:
+        expectPeek(TOKEN_IDENT);
+        if (peekTokenIs(TOKEN_LBRACKET))
+        {
+            // array
+            expectPeek(TOKEN_LBRACKET);
+            compileExpression();
+            expectPeek(TOKEN_RBRACKET);
+        }
+        else if (peekTokenIs(TOKEN_LPAREN) || peekTokenIs(TOKEN_DOT))
+        {
+            compileSubroutineCall();
+        }
+        else
+        {
+            // just id
+        }
+        break;
+    case TOKEN_LPAREN:
+        expectPeek(TOKEN_LPAREN);
+        compileExpression();
+        expectPeek(TOKEN_RPAREN);
+        break;
+    case TOKEN_MINUS:
+    case TOKEN_NOT:
+        nextToken();
+        printTerminal(curToken, toPrint); // operator
+        compileTerm();
+        break;
+
     default:
-        peekError(TOKEN_IDENT); // provisorio
+        cout << "invalid term " << tokenLiteral(peekToken) << endl;
+        exit(1);
     }
     printNonTerminal("/term", toPrint);
 }
@@ -447,5 +478,5 @@ void CompilationEngine::peekError(TokenType t)
 {
     cout << "expected next token to be " << t << ", got " << tokenLiteral(peekToken) << " instead" << endl;
     //= fmt.Sprintf(" %v: expected next token to be %s, got %s instead", line, t, p.peekToken.Type)
-    exit(0);
+    exit(1);
 }

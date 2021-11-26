@@ -87,9 +87,9 @@ bool isSymbol(char c)
 bool isOperator(char c)
 {
 
-    char operators[] = "+-*/&|";
+    char operators[] = "+-*/&|<>";
 
-    return strchr(operators, c) != NULL;
+    return c != 0 && strchr(operators, c) != NULL;
 }
 
 bool isAlpha(char c)
@@ -115,7 +115,9 @@ std::string tagToken(Token tk)
     }
     else if (tk.type >= TOKEN_LPAREN && tk.type <= TOKEN_EQ)
     {
+
         const char c = *tk.start;
+
         switch (c)
         {
         case '<':

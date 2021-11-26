@@ -258,8 +258,10 @@ Token JackTokenizer::symbol()
         return newToken(TOKEN_OR);
     case '~':
         return newToken(TOKEN_NOT);
-    case '<':
+    case '>':
         return newToken(TOKEN_GT);
+    case '<':
+        return newToken(TOKEN_LT);
     case '=':
         return newToken(TOKEN_EQ);
 
