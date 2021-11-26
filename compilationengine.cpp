@@ -51,7 +51,7 @@ void CompilationEngine::compileClass()
 void CompilationEngine::compileSubroutineDec()
 {
 
-    printNonTerminal("subroutineBody", toPrint);
+    printNonTerminal("subroutineDec", toPrint);
 
     if (peekTokenIs(TOKEN_CONSTRUCTOR))
     {
@@ -94,7 +94,7 @@ void CompilationEngine::compileSubroutineDec()
 
     compileSubroutineBody();
 
-    printNonTerminal("subroutineBody", toPrint);
+    printNonTerminal("/subroutineDec", toPrint);
 }
 
 void CompilationEngine::compileParameterList()
@@ -238,9 +238,50 @@ void CompilationEngine::compileDo()
 
     expectPeek(TOKEN_IDENT);
 
+    compileSubroutineCall();
+
     expectPeek(TOKEN_SEMICOLON);
 
     printNonTerminal("/doStatement", toPrint);
+}
+
+void CompilationEngine::compileSubroutineCall()
+{
+
+    if (peekTokenIs(TOKEN_LPAREN))
+    {
+        expectPeek(TOKEN_LPAREN);
+        compileExpressionList();
+        expectPeek(TOKEN_RPAREN);
+    }
+    else
+    {
+        expectPeek(TOKEN_DOT);
+        expectPeek(TOKEN_IDENT);
+
+        expectPeek(TOKEN_LPAREN);
+        compileExpressionList();
+        expectPeek(TOKEN_RPAREN);
+    }
+}
+
+void CompilationEngine::compileExpressionList()
+{
+
+    printNonTerminal("ExpressionList", toPrint);
+
+    if (!peekTokenIs(TOKEN_RPAREN))
+    {
+        compileExpression();
+    }
+
+    while (peekTokenIs(TOKEN_COMMA))
+    {
+        expectPeek(TOKEN_COMMA);
+        compileExpression();
+    }
+
+    printNonTerminal("/ExpressionList", toPrint);
 }
 
 void CompilationEngine::compileWhile()
@@ -305,10 +346,6 @@ void CompilationEngine::compileIf()
     }
 
     printNonTerminal("/ifStatement", toPrint);
-}
-
-void CompilationEngine::compileSubroutineCall()
-{
 }
 
 void CompilationEngine::compileExpression()

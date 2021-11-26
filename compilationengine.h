@@ -33,7 +33,6 @@ public:
     void compileTerm();
     void compileExpressionList();
     void compileSubroutineCall();
-    void compileSubroutineCall(string subName);
 
 private:
     bool peekTokenIs(TokenType t);
