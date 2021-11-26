@@ -25,7 +25,9 @@ void CompilationEngine::compile()
 
     //compileClass();
     //compileLet();
-    compileStatements();
+    //compileStatements();
+    //compileSubroutineBody();
+    compileSubroutineDec();
 
     expectPeek(TOKEN_EOF); // realmente acabou o programa
 }
@@ -44,6 +46,135 @@ void CompilationEngine::compileClass()
     expectPeek(TOKEN_RBRACE);
 
     printNonTerminal("/class", toPrint);
+}
+
+void CompilationEngine::compileSubroutineDec()
+{
+
+    printNonTerminal("subroutineBody", toPrint);
+
+    if (peekTokenIs(TOKEN_CONSTRUCTOR))
+    {
+        expectPeek(TOKEN_CONSTRUCTOR);
+    }
+    else if (peekTokenIs(TOKEN_FUNCTION))
+    {
+        expectPeek(TOKEN_FUNCTION);
+    }
+    else
+    {
+        expectPeek(TOKEN_METHOD);
+    }
+
+    if (peekTokenIs(TOKEN_VOID))
+    {
+        expectPeek(TOKEN_VOID);
+    }
+    else
+    {
+        compileType();
+    }
+
+    expectPeek(TOKEN_IDENT);
+
+    expectPeek(TOKEN_LPAREN);
+
+    if (!peekTokenIs(TOKEN_RPAREN))
+    {
+        compileParameterList();
+    }
+    else
+    {
+        // because of compare xml
+        printNonTerminal("parameterList", toPrint);
+        printNonTerminal("/parameterList", toPrint);
+    }
+
+    expectPeek(TOKEN_RPAREN);
+
+    compileSubroutineBody();
+
+    printNonTerminal("subroutineBody", toPrint);
+}
+
+void CompilationEngine::compileParameterList()
+{
+    printNonTerminal("parameterList", toPrint);
+
+    compileType();
+
+    expectPeek(TOKEN_IDENT);
+
+    while (peekTokenIs(TOKEN_COMMA))
+    {
+        expectPeek(TOKEN_COMMA);
+        compileType();
+        expectPeek(TOKEN_IDENT);
+    }
+
+    printNonTerminal("/parameterList", toPrint);
+}
+
+void CompilationEngine::compileSubroutineBody()
+{
+    printNonTerminal("subroutineBody", toPrint);
+
+    expectPeek(TOKEN_LBRACE);
+
+    while (peekTokenIs(TOKEN_VAR))
+    {
+        compileVarDec();
+    }
+
+    compileStatements();
+
+    expectPeek(TOKEN_RBRACE);
+
+    printNonTerminal("/subroutineBody", toPrint);
+}
+
+void CompilationEngine::compileVarDec()
+{
+    printNonTerminal("varDec", toPrint);
+
+    expectPeek(TOKEN_VAR);
+
+    compileType();
+
+    expectPeek(TOKEN_IDENT);
+
+    while (peekTokenIs(TOKEN_COMMA))
+    {
+        expectPeek(TOKEN_COMMA);
+        expectPeek(TOKEN_IDENT);
+    }
+
+    expectPeek(TOKEN_SEMICOLON);
+
+    printNonTerminal("/varDec", toPrint);
+}
+
+void CompilationEngine::compileType()
+{
+    switch (peekToken.type)
+    {
+    case TOKEN_INT:
+        expectPeek(TOKEN_INT);
+        break;
+    case TOKEN_CHAR:
+        expectPeek(TOKEN_CHAR);
+        break;
+    case TOKEN_BOOLEAN:
+        expectPeek(TOKEN_BOOLEAN);
+        break;
+    case TOKEN_IDENT:
+        expectPeek(TOKEN_IDENT);
+        break;
+    case TOKEN_RETURN:
+        return compileReturn();
+    default:
+        return;
+    }
 }
 
 void CompilationEngine::compileStatements()
@@ -137,7 +268,8 @@ void CompilationEngine::compileReturn()
 
     expectPeek(TOKEN_RETURN);
 
-    compileExpression();
+    if (!peekTokenIs(TOKEN_SEMICOLON))
+        compileExpression();
 
     expectPeek(TOKEN_SEMICOLON);
 
@@ -229,14 +361,13 @@ void CompilationEngine::expectPeek(TokenType t)
     }
     else
     {
-        cout << "error" << endl;
         peekError(t);
-        exit(0);
     }
 }
 
 void CompilationEngine::peekError(TokenType t)
 {
-    cout << "expected next token to be " << t << ", got " << peekToken.type << " instead" << endl;
+    cout << "expected next token to be " << t << ", got " << tokenLiteral(peekToken) << " instead" << endl;
     //= fmt.Sprintf(" %v: expected next token to be %s, got %s instead", line, t, p.peekToken.Type)
+    exit(0);
 }

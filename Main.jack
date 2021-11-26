@@ -1,11 +1,16 @@
-while (10) {
-    if (23) {
-        let x = 10;
+    function void test() {  // Added to test Jack syntax that is not use in
+        var int i, j;       // the Square files.
+        var String s;
+        var Array a;
+        if (i) {
+            let s = i;
+            let s = j;
+            let a[i] = j;
+        }
+        else {              // There is no else keyword in the Square files.
+            let i = i;
+            let j = j;
+            let i = i | j;
+        }
+        return;
     }
-}
-
-while (10) {
-    if (23) {
-        let x = 10;
-    }
-}

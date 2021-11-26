@@ -17,10 +17,11 @@ public:
     void compile();
     void compileClass();
     void compileClassVarDec();
-    void compileSubroutine();
+    void compileSubroutineDec();
     void compileParameterList();
     void compileSubroutineBody();
     void compileVarDec();
+    void compileType();
     void compileStatement();
     void compileStatements();
     void compileDo();
