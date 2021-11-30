@@ -23,13 +23,7 @@ void CompilationEngine::nextToken()
 void CompilationEngine::compile()
 {
 
-    //compileExpression();
     compileClass();
-    //compileLet();
-    //compileStatements();
-    //compileSubroutineBody();
-    //compileSubroutineDec();
-
     expectPeek(TOKEN_EOF); // realmente acabou o programa
 }
 
