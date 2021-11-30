@@ -38,7 +38,6 @@ int main(int argc, char **argv)
 
     if (isDir(input))
     {
-        cout << "dir " << endl;
         if (*input.rbegin() == '/')
             path = input;
         else
@@ -63,7 +62,6 @@ int main(int argc, char **argv)
     }
     else
     {
-        cout << "file" << endl;
         files.push_back(input);
     }
 
