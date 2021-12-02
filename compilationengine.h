@@ -22,7 +22,7 @@ public:
     void compileClassVarDec();
     void compileSubroutineDec();
     void compileParameterList();
-    void compileSubroutineBody(string functionName);
+    void compileSubroutineBody(string functionName, TokenType tokenType);
     void compileVarDec();
     void compileType();
     void compileStatement();

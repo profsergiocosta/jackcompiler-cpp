@@ -145,6 +145,8 @@ void CompilationEngine::compileSubroutineDec()
         expectPeek(TOKEN_METHOD);
     }
 
+    TokenType tokenType = curToken.type;
+
     if (peekTokenIs(TOKEN_VOID))
     {
         expectPeek(TOKEN_VOID);
@@ -173,7 +175,7 @@ void CompilationEngine::compileSubroutineDec()
 
     expectPeek(TOKEN_RPAREN);
 
-    compileSubroutineBody(functionName);
+    compileSubroutineBody(functionName, tokenType);
 
     printNonTerminal("/subroutineDec", toPrint);
 }
@@ -206,7 +208,7 @@ void CompilationEngine::compileParameterList()
     printNonTerminal("/parameterList", toPrint);
 }
 
-void CompilationEngine::compileSubroutineBody(string functionName)
+void CompilationEngine::compileSubroutineBody(string functionName, TokenType tokenType)
 {
     printNonTerminal("subroutineBody", toPrint);
 
@@ -220,6 +222,18 @@ void CompilationEngine::compileSubroutineBody(string functionName)
     int nLocals = st->varCount(sym::VAR);
 
     vm->writeFunction(functionName, nLocals);
+
+    if (tokenType == TOKEN_CONSTRUCTOR)
+    {
+        vm->writePush(CONST, st->varCount(sym::FIELD));
+        vm->writeCall("Memory.alloc", 1);
+        vm->writePop(POINTER, 0);
+    }
+    else if (tokenType == TOKEN_METHOD)
+    {
+        vm->writePush(ARG, 0);    // push "this" of calling object
+        vm->writePop(POINTER, 0); // set "this" of method to the calling object
+    }
 
     compileStatements();
 
