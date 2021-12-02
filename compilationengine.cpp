@@ -478,14 +478,30 @@ void CompilationEngine::compileTerm()
     switch (peekToken.type)
     {
     case TOKEN_NUMBER:
-    case TOKEN_STRING:
-    case TOKEN_TRUE:
+        nextToken();
+        printTerminal(curToken, toPrint);
+        vm->writePush(CONST, std::stoi(tokenLiteral(curToken)));
+        break;
     case TOKEN_FALSE:
     case TOKEN_NULL:
+    case TOKEN_TRUE:
+        nextToken();
+        printTerminal(curToken, toPrint);
+        vm->writePush(CONST, 0);
+        if (curToken.type == TOKEN_TRUE)
+            vm->writeArithmetic(NOT);
+        break;
     case TOKEN_THIS:
+        nextToken();
+        vm->writePush(POINTER, 0);
+        printTerminal(curToken, toPrint);
+        break;
+
+    case TOKEN_STRING:
         nextToken();
         printTerminal(curToken, toPrint);
         break;
+
     case TOKEN_IDENT:
         expectPeek(TOKEN_IDENT);
         if (peekTokenIs(TOKEN_LBRACKET))

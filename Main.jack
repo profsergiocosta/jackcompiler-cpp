@@ -13,8 +13,8 @@ class Main {
 
 
  function void main () {
-        var int x;
-        let x = 42;
+        var boolean x;
+        let x = true;
         return;
   }
 
