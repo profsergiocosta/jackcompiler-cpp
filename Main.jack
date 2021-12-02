@@ -13,8 +13,9 @@ class Main {
 
 
  function void main () {
-        var String s1,s2 ;
-        let s1 =  s2;
+        var int a,b,c ;
+        let c =  -a * -89;
+        let b = ~a;
         return;
   }
 

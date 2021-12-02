@@ -16,6 +16,17 @@ std::map<sym::Kind, Segment>
         {sym::ARG, ARG},
 };
 
+std::map<TokenType, Command>
+    binOperators = {
+        {TOKEN_PLUS, ADD},
+        {TOKEN_MINUS, SUB},
+        {TOKEN_LT, LT},
+        {TOKEN_GT, GT},
+        {TOKEN_EQ, EQ},
+        {TOKEN_AND, AND},
+        {TOKEN_OR, OR},
+};
+
 using namespace std;
 
 CompilationEngine::CompilationEngine(const char *inFileName, const char *outFileName)
@@ -465,16 +476,37 @@ void CompilationEngine::compileExpression()
     {
         nextToken();
         printTerminal(curToken, toPrint); // operator
+        TokenType op = curToken.type;
         compileTerm();
+        compileOperators(op);
     }
 
     printNonTerminal("/expression", toPrint);
+}
+
+void CompilationEngine::compileOperators(TokenType type)
+{
+
+    if (type == TOKEN_ASTERISK)
+    {
+        vm->writeCall("Math.multiply", 2);
+    }
+    else if (type == TOKEN_SLASH)
+    {
+        vm->writeCall("Math.divide", 2);
+    }
+    else
+    {
+        vm->writeArithmetic(binOperators[type]);
+    }
 }
 
 void CompilationEngine::compileTerm()
 {
     printNonTerminal("term", toPrint);
     std::string strvalue;
+    TokenType tokentype;
+
     switch (peekToken.type)
     {
     case TOKEN_NUMBER:
@@ -547,8 +579,14 @@ void CompilationEngine::compileTerm()
     case TOKEN_MINUS:
     case TOKEN_NOT:
         nextToken();
+        tokentype = curToken.type;
         printTerminal(curToken, toPrint); // operator
         compileTerm();
+
+        if (tokentype == TOKEN_MINUS)
+            vm->writeArithmetic(NEG);
+        else
+            vm->writeArithmetic(NOT);
         break;
 
     default:

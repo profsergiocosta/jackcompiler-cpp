@@ -3,8 +3,15 @@ push constant 2
 push argument 0
 call Math.multiply 2
 return
-function Main.main 2
-push local 1
-pop local 0
+function Main.main 3
+push local 0
+neg
+push constant 89
+neg
+call Math.multiply 2
+pop local 2
+push local 0
+not
+pop local 1
 push constant 0
 return

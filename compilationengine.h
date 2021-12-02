@@ -15,6 +15,7 @@ class CompilationEngine
 {
 public:
     CompilationEngine(const char *inFileName, const char *outFileName);
+
     void nextToken();
     void compile();
     void compileClass();
@@ -35,6 +36,7 @@ public:
     void compileTerm();
     void compileExpressionList();
     void compileSubroutineCall();
+    void compileOperators(TokenType t);
 
 private:
     bool peekTokenIs(TokenType t);
