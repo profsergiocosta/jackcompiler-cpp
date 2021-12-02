@@ -1,27 +1,10 @@
 function Main.soma 0
 push constant 2
+push argument 0
+call Math.multiply 2
 return
-function Main.main 1
-push constant 9
-call String.new 1
-push constant 79
-call String.appendChar 2
-push constant 108
-call String.appendChar 2
-push constant 97
-call String.appendChar 2
-push constant 32
-call String.appendChar 2
-push constant 77
-call String.appendChar 2
-push constant 117
-call String.appendChar 2
-push constant 110
-call String.appendChar 2
-push constant 100
-call String.appendChar 2
-push constant 111
-call String.appendChar 2
+function Main.main 2
+push local 1
 pop local 0
 push constant 0
 return

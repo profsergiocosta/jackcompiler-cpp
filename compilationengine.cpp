@@ -535,6 +535,8 @@ void CompilationEngine::compileTerm()
                 std::cerr << "Variable " + varName + " not defined" << endl;
                 exit(1);
             }
+
+            vm->writePush(kindToSeg[symbol.kind], symbol.index);
         }
         break;
     case TOKEN_LPAREN:
