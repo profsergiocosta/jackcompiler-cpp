@@ -13,8 +13,8 @@ class Main {
 
 
  function void main () {
-        var boolean x;
-        let x = true;
+        var String s;
+        let s = "Ola Mundo";
         return;
   }
 

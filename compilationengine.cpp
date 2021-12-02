@@ -474,7 +474,7 @@ void CompilationEngine::compileExpression()
 void CompilationEngine::compileTerm()
 {
     printNonTerminal("term", toPrint);
-
+    std::string strvalue;
     switch (peekToken.type)
     {
     case TOKEN_NUMBER:
@@ -500,6 +500,16 @@ void CompilationEngine::compileTerm()
     case TOKEN_STRING:
         nextToken();
         printTerminal(curToken, toPrint);
+
+        strvalue = tokenLiteral(curToken);
+        vm->writePush(CONST, strvalue.length());
+        vm->writeCall("String.new", 1);
+        for (int i = 0; i < strvalue.length(); i++)
+        {
+            vm->writePush(CONST, (int)strvalue[i]);
+            vm->writeCall("String.appendChar", 2);
+        }
+
         break;
 
     case TOKEN_IDENT:
