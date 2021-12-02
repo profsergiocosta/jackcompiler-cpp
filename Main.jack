@@ -5,8 +5,10 @@ class Main {
 
  function void main () {
         var int d;
-        if (true) {
-           let d = 10;
+        while (d < 10) {
+           let d = d + 1;
+           do Output.printInt(d);
+           do Output.println();
         }
         return;
   }

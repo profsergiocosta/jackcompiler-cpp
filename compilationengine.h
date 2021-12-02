@@ -55,6 +55,7 @@ private:
     string className;
 
     int ifLabelNum;
+    int whileLabelNum;
 };
 
 #endif

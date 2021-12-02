@@ -38,6 +38,7 @@ CompilationEngine::CompilationEngine(const char *inFileName, const char *outFile
     st = new SymbolTable();
 
     ifLabelNum = 0;
+    whileLabelNum = 0;
 }
 
 void CompilationEngine::nextToken()
@@ -127,6 +128,7 @@ void CompilationEngine::compileSubroutineDec()
     printNonTerminal("subroutineDec", toPrint);
 
     ifLabelNum = 0;
+    whileLabelNum = 0;
 
     st->startSubroutine();
 
@@ -428,17 +430,31 @@ int CompilationEngine::compileExpressionList()
 void CompilationEngine::compileWhile()
 {
     printNonTerminal("whileStatement", toPrint);
+
+    string labelTrue, labelFalse;
+    labelTrue = "WHILE_EXP" + to_string(whileLabelNum);
+    labelFalse = "WHILE_END" + to_string(whileLabelNum);
+    whileLabelNum++;
+
+    vm->writeLabel(labelTrue); // while true label to execute statements again
+
     expectPeek(TOKEN_WHILE);
 
     expectPeek(TOKEN_LPAREN);
 
     compileExpression();
 
+    vm->writeArithmetic(NOT);
+    vm->writeIf(labelFalse);
+
     expectPeek(TOKEN_RPAREN);
 
     expectPeek(TOKEN_LBRACE);
 
     compileStatements();
+
+    vm->writeGoto(labelTrue);   // Go back to labelTrue and check condition
+    vm->writeLabel(labelFalse); // Breaks out of while loop because ~(condition) is true
 
     expectPeek(TOKEN_RBRACE);
 
