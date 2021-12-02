@@ -34,7 +34,7 @@ public:
     void compileIf();
     void compileExpression();
     void compileTerm();
-    void compileExpressionList();
+    int compileExpressionList();
     void compileSubroutineCall();
     void compileOperators(TokenType t);
 

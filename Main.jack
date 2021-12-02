@@ -1,21 +1,12 @@
 class Main {
  function int soma (int x, int y) {
-        return 2 * x;
+        return  x + y;
  }
 
-/*
  function void main () {
         var int d;
         let d = Main.soma(4,5);
-        return;
-  }
-*/
-
-
- function void main () {
-        var int a,b,c ;
-        let c =  -a * -89;
-        let b = ~a;
+        do Output.printInt(d);
         return;
   }
 

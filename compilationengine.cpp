@@ -358,7 +358,12 @@ void CompilationEngine::compileDo()
 void CompilationEngine::compileSubroutineCall()
 {
 
-    if (peekTokenIs(TOKEN_LPAREN))
+    string funcname;
+    int numArgs = 0;
+
+    string ident = tokenLiteral(curToken); // nome da classe ou objeto
+
+    if (peekTokenIs(TOKEN_LPAREN)) // é um metodo da propria classe
     {
         expectPeek(TOKEN_LPAREN);
         compileExpressionList();
@@ -366,32 +371,52 @@ void CompilationEngine::compileSubroutineCall()
     }
     else
     {
+        // pode ser um metodo de um outro objeto ou uma função
         expectPeek(TOKEN_DOT);
         expectPeek(TOKEN_IDENT);
 
+        sym::Symbol symbol;
+
+        if (st->resolve(ident, symbol)) // é metodo de um objeto
+        {
+        }
+        else
+        { // é uma função
+            funcname = tokenLiteral(curToken);
+            funcname = ident + "." + funcname;
+            cout << funcname << endl;
+        }
+
         expectPeek(TOKEN_LPAREN);
-        compileExpressionList();
+        numArgs = compileExpressionList();
+
         expectPeek(TOKEN_RPAREN);
+        vm->writeCall(funcname, numArgs);
     }
 }
 
-void CompilationEngine::compileExpressionList()
+int CompilationEngine::compileExpressionList()
 {
 
     printNonTerminal("expressionList", toPrint);
 
+    int numArgs = 0;
+
     if (!peekTokenIs(TOKEN_RPAREN))
     {
         compileExpression();
+        numArgs++;
     }
 
     while (peekTokenIs(TOKEN_COMMA))
     {
         expectPeek(TOKEN_COMMA);
         compileExpression();
+        numArgs++;
     }
 
     printNonTerminal("/expressionList", toPrint);
+    return numArgs;
 }
 
 void CompilationEngine::compileWhile()
