@@ -1,2 +1,6 @@
 function Main.soma 0
+return
 function Main.main 1
+pop local 0
+push constant 0
+return

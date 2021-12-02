@@ -6,6 +6,15 @@
 #include "symbol.h"
 
 #include <iostream>
+#include <map>
+
+std::map<sym::Kind, Segment>
+    kindToSeg = {
+        {sym::STATIC, STATIC},
+        {sym::FIELD, THIS},
+        {sym::VAR, LOCAL},
+        {sym::ARG, ARG},
+};
 
 using namespace std;
 
@@ -314,6 +323,8 @@ void CompilationEngine::compileLet()
 
     compileExpression();
 
+    vm->writePop(kindToSeg[symbol.kind], symbol.index);
+
     expectPeek(TOKEN_SEMICOLON);
 
     printNonTerminal("/letStatement", toPrint);
@@ -398,7 +409,15 @@ void CompilationEngine::compileReturn()
     expectPeek(TOKEN_RETURN);
 
     if (!peekTokenIs(TOKEN_SEMICOLON))
+    {
         compileExpression();
+    }
+    else
+    {
+        vm->writePush(CONST, 0);
+    }
+
+    vm->writeReturn();
 
     expectPeek(TOKEN_SEMICOLON);
 

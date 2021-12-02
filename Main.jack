@@ -3,9 +3,18 @@ class Main {
         return 2 * x;
  }
 
+/*
  function void main () {
         var int d;
         let d = Main.soma(4,5);
+        return;
+  }
+*/
+
+
+ function void main () {
+        var int x;
+        let x = 42;
         return;
   }
 
