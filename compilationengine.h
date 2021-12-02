@@ -6,6 +6,7 @@
 #include "jacktokenizer.h"
 
 #include "token.h"
+#include "symboltable.h"
 
 using namespace std;
 
@@ -40,7 +41,7 @@ private:
     void peekError(TokenType t);
 
     JackTokenizer *jt;
-
+    SymbolTable *st;
     bool toPrint;
 
     Token curToken;

@@ -3,6 +3,8 @@
 
 #include "jacktokenizer.h"
 
+#include "symbol.h"
+
 #include <iostream>
 
 using namespace std;
@@ -11,7 +13,8 @@ CompilationEngine::CompilationEngine(const char *inFileName)
 {
     jt = new JackTokenizer(inFileName);
     nextToken();
-    toPrint = true;
+    toPrint = false;
+    st = new SymbolTable();
 }
 
 void CompilationEngine::nextToken()
@@ -57,23 +60,34 @@ void CompilationEngine::compileClassVarDec()
 {
 
     printNonTerminal("classVarDec", toPrint);
+    sym::Kind kind;
 
     if (peekTokenIs(TOKEN_FIELD))
     {
+        kind = sym::FIELD;
         expectPeek(TOKEN_FIELD);
     }
     else
     {
+        kind = sym::STATIC;
         expectPeek(TOKEN_STATIC);
     }
 
     compileType();
+    string vartype = tokenLiteral(curToken);
+
     expectPeek(TOKEN_IDENT);
+    string varname = tokenLiteral(curToken);
+
+    st->define(varname, vartype, kind);
 
     while (peekTokenIs(TOKEN_COMMA))
     {
         expectPeek(TOKEN_COMMA);
         expectPeek(TOKEN_IDENT);
+
+        varname = tokenLiteral(curToken);
+        st->define(varname, vartype, kind);
     }
 
     expectPeek(TOKEN_SEMICOLON);
@@ -85,6 +99,8 @@ void CompilationEngine::compileSubroutineDec()
 {
 
     printNonTerminal("subroutineDec", toPrint);
+
+    st->startSubroutine();
 
     if (peekTokenIs(TOKEN_CONSTRUCTOR))
     {
@@ -134,15 +150,25 @@ void CompilationEngine::compileParameterList()
 {
     printNonTerminal("parameterList", toPrint);
 
+    sym::Kind kind = sym::ARG;
+
     compileType();
+    string vartype = tokenLiteral(curToken);
 
     expectPeek(TOKEN_IDENT);
+    string varname = tokenLiteral(curToken);
+
+    st->define(varname, vartype, kind);
 
     while (peekTokenIs(TOKEN_COMMA))
     {
         expectPeek(TOKEN_COMMA);
         compileType();
+        string vartype = tokenLiteral(curToken);
+
         expectPeek(TOKEN_IDENT);
+        string varname = tokenLiteral(curToken);
+        st->define(varname, vartype, kind);
     }
 
     printNonTerminal("/parameterList", toPrint);
@@ -172,14 +198,23 @@ void CompilationEngine::compileVarDec()
 
     expectPeek(TOKEN_VAR);
 
+    sym::Kind kind = sym::VAR;
+
     compileType();
+    string vartype = tokenLiteral(curToken);
 
     expectPeek(TOKEN_IDENT);
+    string varname = tokenLiteral(curToken);
+
+    st->define(varname, vartype, kind);
 
     while (peekTokenIs(TOKEN_COMMA))
     {
         expectPeek(TOKEN_COMMA);
         expectPeek(TOKEN_IDENT);
+
+        varname = tokenLiteral(curToken);
+        st->define(varname, vartype, kind);
     }
 
     expectPeek(TOKEN_SEMICOLON);
@@ -247,6 +282,16 @@ void CompilationEngine::compileLet()
     expectPeek(TOKEN_LET);
 
     expectPeek(TOKEN_IDENT);
+
+    string varName = tokenLiteral(curToken);
+
+    sym::Symbol symbol;
+
+    if (!st->resolve(varName, symbol))
+    {
+        std::cerr << "Variable " + varName + " not defined" << endl;
+        exit(1);
+    }
 
     while (peekTokenIs(TOKEN_LBRACKET))
     {
@@ -427,7 +472,14 @@ void CompilationEngine::compileTerm()
         }
         else
         {
-            // just id
+            sym::Symbol symbol;
+            string varName = tokenLiteral(curToken);
+
+            if (!st->resolve(varName, symbol))
+            {
+                std::cerr << "Variable " + varName + " not defined" << endl;
+                exit(1);
+            }
         }
         break;
     case TOKEN_LPAREN:

@@ -1,0 +1,17 @@
+class Main {
+
+    field int a;
+    static Point w;    
+
+
+    function void main (int k, int xy) {
+
+        var int a5;
+        
+        let a5 = 10;
+
+        let xy = a5;
+
+        return;
+    }
+}

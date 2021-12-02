@@ -71,7 +71,6 @@ bool SymbolTable::resolve(string name, Symbol &s)
   else
   {
     r = false;
-    throw string("Variable not defined!");
   }
 
   return r;
