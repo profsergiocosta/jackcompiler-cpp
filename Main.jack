@@ -5,8 +5,9 @@ class Main {
 
  function void main () {
         var int d;
-        let d = Main.soma(4,5);
-        do Output.printInt(d);
+        if (true) {
+           let d = 10;
+        }
         return;
   }
 

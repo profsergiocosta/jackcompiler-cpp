@@ -53,6 +53,8 @@ private:
     Token peekToken;
 
     string className;
+
+    int ifLabelNum;
 };
 
 #endif

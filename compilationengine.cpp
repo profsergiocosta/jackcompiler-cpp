@@ -36,6 +36,8 @@ CompilationEngine::CompilationEngine(const char *inFileName, const char *outFile
     nextToken();
     toPrint = false;
     st = new SymbolTable();
+
+    ifLabelNum = 0;
 }
 
 void CompilationEngine::nextToken()
@@ -123,6 +125,8 @@ void CompilationEngine::compileSubroutineDec()
 {
 
     printNonTerminal("subroutineDec", toPrint);
+
+    ifLabelNum = 0;
 
     st->startSubroutine();
 
@@ -465,6 +469,12 @@ void CompilationEngine::compileIf()
 {
     printNonTerminal("ifStatement", toPrint);
 
+    string labelTrue = "IF_TRUE" + to_string(ifLabelNum);
+    string labelFalse = "IF_FALSE" + to_string(ifLabelNum);
+    string labelEnd = "IF_END" + to_string(ifLabelNum);
+
+    ifLabelNum++;
+
     expectPeek(TOKEN_IF);
 
     expectPeek(TOKEN_LPAREN);
@@ -473,11 +483,22 @@ void CompilationEngine::compileIf()
 
     expectPeek(TOKEN_RPAREN);
 
+    vm->writeIf(labelTrue);
+    vm->writeGoto(labelFalse);
+    vm->writeLabel(labelTrue);
+
     expectPeek(TOKEN_LBRACE);
 
     compileStatements();
 
     expectPeek(TOKEN_RBRACE);
+
+    if (peekTokenIs(TOKEN_ELSE))
+    {
+        vm->writeGoto(labelEnd);
+    }
+
+    vm->writeLabel(labelFalse);
 
     if (peekTokenIs(TOKEN_ELSE))
     {
@@ -488,6 +509,7 @@ void CompilationEngine::compileIf()
         compileStatements();
 
         expectPeek(TOKEN_RBRACE);
+        vm->writeLabel(labelEnd);
     }
 
     printNonTerminal("/ifStatement", toPrint);
