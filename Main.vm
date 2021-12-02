@@ -1,61 +1,13 @@
-function Main.soma 0
+function Main.f 0
 push argument 0
 pop pointer 0
-push constant 10
-call Output.printInt 1
-pop temp 0
-push argument 1
+push constant 0
 return
-function Main.main 2
+function Main.g 0
 push argument 0
 pop pointer 0
-push constant 10
-call Array.new 1
-pop local 0
-push constant 0
-push local 0
-add
-push constant 10
+push pointer 0
+call Main.f 1
 pop temp 0
-pop pointer 1
-push temp 0
-pop that 0
-push constant 1
-push local 0
-add
-push constant 20
-pop temp 0
-pop pointer 1
-push temp 0
-pop that 0
-push constant 2
-push local 0
-add
-push constant 30
-pop temp 0
-pop pointer 1
-push temp 0
-pop that 0
-push constant 0
-pop local 1
-label WHILE_EXP0
-push local 1
-push constant 3
-lt
-not
-if-goto WHILE_END0
-push local 1
-push local 0
-add
-pop pointer 1
-push that 0
-call Output.printInt 1
-pop temp 0
-push local 1
-push constant 1
-add
-pop local 1
-goto WHILE_EXP0
-label WHILE_END0
 push constant 0
 return

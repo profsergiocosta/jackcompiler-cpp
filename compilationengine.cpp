@@ -433,15 +433,14 @@ void CompilationEngine::compileSubroutineCall()
         else
         { // é uma função
             funcname = ident + "." + funcname;
-            cout << funcname << endl;
         }
 
         expectPeek(TOKEN_LPAREN);
         numArgs = compileExpressionList() + numArgs; // adicionar 1 do metodo
 
         expectPeek(TOKEN_RPAREN);
-        vm->writeCall(funcname, numArgs);
     }
+    vm->writeCall(funcname, numArgs);
 }
 
 int CompilationEngine::compileExpressionList()

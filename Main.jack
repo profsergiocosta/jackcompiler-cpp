@@ -1,23 +1,13 @@
 class Main {
- method int soma (int x, int y) {
-        do Output.printInt(10);
-        return  x;
- }
 
- method void main () {
-        var Array v;
-        var int i;
-        let v = Array.new (10);
-        let v[0] = 10;
-        let v[1] = 20;
-        let v[2] = 30;
-        let i = 0;
-        while (i < 3) {
-            do Output.printInt(v[i]);    
-            let i = i + 1;
-        }
+    method void f() {
 
         return;
-  }
+    }
+
+    method void g() {
+        do f();
+        return;
+    }
 
 }

@@ -87,7 +87,7 @@ bool isSymbol(char c)
 bool isOperator(char c)
 {
 
-    char operators[] = "+-*/&|<>";
+    char operators[] = "+-*/&|<>=";
 
     return c != 0 && strchr(operators, c) != NULL;
 }
