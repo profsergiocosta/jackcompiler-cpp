@@ -142,6 +142,7 @@ void CompilationEngine::compileSubroutineDec()
     }
     else
     {
+        st->define("this", className, sym::ARG); // first argument of a method is always "this"
         expectPeek(TOKEN_METHOD);
     }
 
@@ -405,29 +406,38 @@ void CompilationEngine::compileSubroutineCall()
     if (peekTokenIs(TOKEN_LPAREN)) // é um metodo da propria classe
     {
         expectPeek(TOKEN_LPAREN);
-        compileExpressionList();
+        vm->writePush(POINTER, 0); // metodo do proprio objeto
+        numArgs = compileExpressionList();
         expectPeek(TOKEN_RPAREN);
+        numArgs++;
+
+        funcname = className + "." + ident;
     }
     else
     {
         // pode ser um metodo de um outro objeto ou uma função
+
         expectPeek(TOKEN_DOT);
         expectPeek(TOKEN_IDENT);
 
         sym::Symbol symbol;
 
+        funcname = tokenLiteral(curToken);
+
         if (st->resolve(ident, symbol)) // é metodo de um objeto
         {
+            vm->writePush(kindToSeg[symbol.kind], symbol.index);
+            funcname = symbol.type + "." + funcname;
+            numArgs = 1;
         }
         else
         { // é uma função
-            funcname = tokenLiteral(curToken);
             funcname = ident + "." + funcname;
             cout << funcname << endl;
         }
 
         expectPeek(TOKEN_LPAREN);
-        numArgs = compileExpressionList();
+        numArgs = compileExpressionList() + numArgs; // adicionar 1 do metodo
 
         expectPeek(TOKEN_RPAREN);
         vm->writeCall(funcname, numArgs);
@@ -723,7 +733,7 @@ void CompilationEngine::expectPeek(TokenType t)
 
 void CompilationEngine::peekError(TokenType t)
 {
-    cout << "expected next token to be " << t << ", got " << tokenLiteral(peekToken) << " instead" << endl;
+    cout << peekToken.line << ":expected next token to be " << t << ", got " << tokenLiteral(peekToken) << " instead" << endl;
     //= fmt.Sprintf(" %v: expected next token to be %s, got %s instead", line, t, p.peekToken.Type)
     exit(1);
 }

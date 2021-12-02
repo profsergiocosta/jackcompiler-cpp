@@ -1,9 +1,10 @@
 class Main {
- function int soma (int x, int y) {
-        return  x + y;
+ method int soma (int x, int y) {
+        do Output.printInt(10);
+        return  x;
  }
 
- function void main () {
+ method void main () {
         var Array v;
         var int i;
         let v = Array.new (10);
