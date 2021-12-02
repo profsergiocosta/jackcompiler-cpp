@@ -350,6 +350,8 @@ void CompilationEngine::compileDo()
 
     compileSubroutineCall();
 
+    vm->writePop(TEMP, 0);
+
     expectPeek(TOKEN_SEMICOLON);
 
     printNonTerminal("/doStatement", toPrint);
