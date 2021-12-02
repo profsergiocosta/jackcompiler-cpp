@@ -4,12 +4,18 @@ class Main {
  }
 
  function void main () {
-        var int d;
-        while (d < 10) {
-           let d = d + 1;
-           do Output.printInt(d);
-           do Output.println();
+        var Array v;
+        var int i;
+        let v = Array.new (10);
+        let v[0] = 10;
+        let v[1] = 20;
+        let v[2] = 30;
+        let i = 0;
+        while (i < 3) {
+            do Output.printInt(v[i]);    
+            let i = i + 1;
         }
+
         return;
   }
 

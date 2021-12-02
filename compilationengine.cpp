@@ -319,6 +319,8 @@ void CompilationEngine::compileLet()
 
     expectPeek(TOKEN_IDENT);
 
+    bool isArray = false;
+
     string varName = tokenLiteral(curToken);
 
     sym::Symbol symbol;
@@ -329,18 +331,33 @@ void CompilationEngine::compileLet()
         exit(1);
     }
 
-    while (peekTokenIs(TOKEN_LBRACKET))
+    while (peekTokenIs(TOKEN_LBRACKET)) // array
     {
         expectPeek(TOKEN_LBRACKET);
         compileExpression();
+
+        vm->writePush(kindToSeg[symbol.kind], symbol.index);
+        vm->writeArithmetic(ADD);
+
         expectPeek(TOKEN_RBRACKET);
+        isArray = true;
     }
 
     expectPeek(TOKEN_EQ);
 
     compileExpression();
 
-    vm->writePop(kindToSeg[symbol.kind], symbol.index);
+    if (isArray)
+    {
+        vm->writePop(TEMP, 0);    // push result back onto stack
+        vm->writePop(POINTER, 1); // pop address pointer into pointer 1
+        vm->writePush(TEMP, 0);   // push result back onto stack
+        vm->writePop(THAT, 0);    // Store right hand side evaluation in THAT 0.
+    }
+    else
+    {
+        vm->writePop(kindToSeg[symbol.kind], symbol.index);
+    }
 
     expectPeek(TOKEN_SEMICOLON);
 
@@ -611,19 +628,14 @@ void CompilationEngine::compileTerm()
 
     case TOKEN_IDENT:
         expectPeek(TOKEN_IDENT);
-        if (peekTokenIs(TOKEN_LBRACKET))
-        {
-            // array
-            expectPeek(TOKEN_LBRACKET);
-            compileExpression();
-            expectPeek(TOKEN_RBRACKET);
-        }
-        else if (peekTokenIs(TOKEN_LPAREN) || peekTokenIs(TOKEN_DOT))
+
+        if (peekTokenIs(TOKEN_LPAREN) || peekTokenIs(TOKEN_DOT))
         {
             compileSubroutineCall();
         }
         else
-        {
+        { // variavel comum ou array
+
             sym::Symbol symbol;
             string varName = tokenLiteral(curToken);
 
@@ -633,7 +645,22 @@ void CompilationEngine::compileTerm()
                 exit(1);
             }
 
-            vm->writePush(kindToSeg[symbol.kind], symbol.index);
+            if (peekTokenIs(TOKEN_LBRACKET)) // array
+            {
+                expectPeek(TOKEN_LBRACKET);
+                compileExpression();
+
+                vm->writePush(kindToSeg[symbol.kind], symbol.index);
+                vm->writeArithmetic(ADD);
+
+                expectPeek(TOKEN_RBRACKET);
+                vm->writePop(POINTER, 1); // pop address pointer into pointer 1
+                vm->writePush(THAT, 0);   // push the value of the address pointer back onto stack
+            }
+            else
+            {
+                vm->writePush(kindToSeg[symbol.kind], symbol.index);
+            }
         }
         break;
     case TOKEN_LPAREN:
