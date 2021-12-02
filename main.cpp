@@ -71,7 +71,7 @@ int main(int argc, char **argv)
         output = input.substr(0, input.find_last_of(".")) + ".vm";
         cout << files[i].c_str() << "--" << output << endl;
 
-        CompilationEngine *engine = new CompilationEngine(input.c_str());
+        CompilationEngine *engine = new CompilationEngine(input.c_str(), output.c_str());
         engine->compile();
     }
     return 0;

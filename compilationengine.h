@@ -7,20 +7,21 @@
 
 #include "token.h"
 #include "symboltable.h"
+#include "vmwriter.h"
 
 using namespace std;
 
 class CompilationEngine
 {
 public:
-    CompilationEngine(const char *inFileName);
+    CompilationEngine(const char *inFileName, const char *outFileName);
     void nextToken();
     void compile();
     void compileClass();
     void compileClassVarDec();
     void compileSubroutineDec();
     void compileParameterList();
-    void compileSubroutineBody();
+    void compileSubroutineBody(string functionName);
     void compileVarDec();
     void compileType();
     void compileStatement();
@@ -42,10 +43,14 @@ private:
 
     JackTokenizer *jt;
     SymbolTable *st;
+    VMWriter *vm;
+
     bool toPrint;
 
     Token curToken;
     Token peekToken;
+
+    string className;
 };
 
 #endif

@@ -9,9 +9,10 @@
 
 using namespace std;
 
-CompilationEngine::CompilationEngine(const char *inFileName)
+CompilationEngine::CompilationEngine(const char *inFileName, const char *outFileName)
 {
     jt = new JackTokenizer(inFileName);
+    vm = new VMWriter(outFileName);
     nextToken();
     toPrint = false;
     st = new SymbolTable();
@@ -38,6 +39,9 @@ void CompilationEngine::compileClass()
     expectPeek(TOKEN_CLASS);
 
     expectPeek(TOKEN_IDENT);
+    className = tokenLiteral(curToken);
+
+    // adicionar a verificacao do nome da classe com o nome do arquivo.
 
     expectPeek(TOKEN_LBRACE);
 
@@ -126,6 +130,8 @@ void CompilationEngine::compileSubroutineDec()
 
     expectPeek(TOKEN_IDENT);
 
+    string functionName = className + "." + tokenLiteral(curToken);
+
     expectPeek(TOKEN_LPAREN);
 
     if (!peekTokenIs(TOKEN_RPAREN))
@@ -141,7 +147,7 @@ void CompilationEngine::compileSubroutineDec()
 
     expectPeek(TOKEN_RPAREN);
 
-    compileSubroutineBody();
+    compileSubroutineBody(functionName);
 
     printNonTerminal("/subroutineDec", toPrint);
 }
@@ -174,7 +180,7 @@ void CompilationEngine::compileParameterList()
     printNonTerminal("/parameterList", toPrint);
 }
 
-void CompilationEngine::compileSubroutineBody()
+void CompilationEngine::compileSubroutineBody(string functionName)
 {
     printNonTerminal("subroutineBody", toPrint);
 
@@ -184,6 +190,10 @@ void CompilationEngine::compileSubroutineBody()
     {
         compileVarDec();
     }
+
+    int nLocals = st->varCount(sym::VAR);
+
+    vm->writeFunction(functionName, nLocals);
 
     compileStatements();
 
